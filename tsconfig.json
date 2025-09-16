@@ -20,7 +20,9 @@
     "noEmit": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "jsx": "preserve",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "types": ["react", "react-dom"],
     "plugins": [{ "name": "next" }],
     "incremental": true,
 

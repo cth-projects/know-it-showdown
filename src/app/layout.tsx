@@ -6,6 +6,7 @@ import { Geist } from "next/font/google";
 import { TRPCReactProvider } from "@/trpc/react";
 
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { PusherProvider } from "@/contexts/PusherContext";
 
 export const metadata: Metadata = {
   title: "Know-it Showdown",
@@ -25,14 +26,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${geist.variable}`}>
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <TRPCReactProvider>{children}</TRPCReactProvider>
-        </ThemeProvider>
+        <PusherProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <TRPCReactProvider>{children}</TRPCReactProvider>
+          </ThemeProvider>
+        </PusherProvider>
       </body>
     </html>
   );
