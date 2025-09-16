@@ -32,6 +32,14 @@ export default function Join() {
         >
           Join
         </Button>
+        <Button
+          onClick={() => {
+            router.push(`game/${code}`);
+          }}
+          variant="outline"
+        >
+          Create Game
+        </Button>
       </div>
     </Fragment>
   );
