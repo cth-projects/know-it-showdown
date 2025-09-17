@@ -10,6 +10,13 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+enum GameState {
+    LOBBY
+    QUESTION
+    RESULT
+    FINAL_RESULT
+}
+
 model Category {
     name      String     @id
     questions Question[]
@@ -20,8 +27,32 @@ model Question {
     question     String   @unique
     answer       Int
     categoryName String   @map("category")
-    category     Category @relation(fields: [categoryName], references: [name])
     updatedAt    DateTime @updatedAt
+
+    category Category @relation(fields: [categoryName], references: [name])
+    games    Game[]
+}
+
+model Player {
+    name          String
+    gameCode      String
+    score         Int    @default(0)
+    playerAnswers Int[]
+
+    game Game @relation(fields: [gameCode], references: [gameCode], onDelete: Cascade)
+
+    @@id([name, gameCode])
+}
+
+model Game {
+    gameCode        String    @id
+    gameState       GameState @default(LOBBY)
+    currentQuestion Int       @default(0)
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+
+    players   Player[]
+    questions Question[]
 }
 
 // Example
