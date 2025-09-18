@@ -3,20 +3,20 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Fragment } from "react/jsx-runtime";
 import { usePusherContext } from "@/contexts/PusherContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
 export default function playerlist() {
     const { subscribe, unsubscribe } = usePusherContext();
-    var players:any[] = ["janne", "loffe", "carlsson"]; /*Testdata*/
+    const [players, setPlayers] = useState<string[]>(["janne", "loffe", "carlsson"])
     const param = useParams();
     const code = param.code as string;
 
     useEffect(() => {
     const channel = subscribe(`presenter-${code}`);
 
-    channel.bind("playerlist-updated", (playerlist:any[]) => {
-        players = playerlist;
+    channel.bind("playerlist-updated", (new_playerlist:string[]) => {
+        setPlayers(new_playerlist);
     });
 
     return () => {
