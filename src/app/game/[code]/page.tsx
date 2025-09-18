@@ -59,6 +59,7 @@ export default function GamePage() {
             <p className="text-lg">
               Welcome,{" "}
               <span className="text-[hsl(280,100%,70%)]">{playerName}</span>!
+              Waiting for game to start.
             </p>
 
             <Button
