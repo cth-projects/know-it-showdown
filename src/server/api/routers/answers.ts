@@ -20,7 +20,7 @@ export const answersRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { gameCode, playerName, answer } = input;
 
-      const game = await ctx.db.game.findUnique({
+      const game = await ctx.db.game0To100.findUnique({
         where: { gameCode },
         include: {
           questions: true,
@@ -49,7 +49,7 @@ export const answersRouter = createTRPCRouter({
       }
 
       const player = game.players[0]!;
-      const currentQuestionIndex = game.currentQuestion;
+      const currentQuestionIndex = game.currentQuestionIndex;
 
       if (player.playerAnswers.length > currentQuestionIndex) {
         throw new TRPCError({
@@ -71,7 +71,7 @@ export const answersRouter = createTRPCRouter({
         currentQuestion.answer,
       );
 
-      await ctx.db.player.update({
+      await ctx.db.game0To100Player.update({
         where: {
           name_gameCode: { name: playerName, gameCode },
         },

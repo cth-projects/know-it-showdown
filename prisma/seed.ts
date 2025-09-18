@@ -19,7 +19,7 @@ async function main() {
   ];
 
   for (const categoryName of categories) {
-    await prisma.category.upsert({
+    await prisma.game0To100Category.upsert({
       where: { name: categoryName },
       update: {},
       create: { name: categoryName },
@@ -121,7 +121,7 @@ async function main() {
   ];
 
   for (const questionData of sampleQuestions) {
-    await prisma.question.upsert({
+    await prisma.game0To100Question.upsert({
       where: { question: questionData.question },
       update: {},
       create: questionData,
