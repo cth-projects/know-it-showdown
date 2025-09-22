@@ -3,6 +3,11 @@
 - [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
 
 Run `start-database.sh` before running project.
+
+Run `bun setup` before starting to work
+
+Run `bun db:seed` to seed database with sample questions
+
 Run `bun db:migrate` before running project.
 Run `bun db:studio` to visually see the database.
 Run `bun dev` to start the project.
