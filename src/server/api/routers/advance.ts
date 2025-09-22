@@ -40,7 +40,7 @@ export const advanceRouter = createTRPCRouter({
       // Check for missing player answers and add defaults
       if (nextState === Game0To100State.RESULT) {
         const currentQuestion = game.questions[game.currentQuestionIndex];
-        const DEFAULT_ANSWER = 50;
+        const DEFAULT_ANSWER = 0;
 
         for (const player of game.players) {
           if (player.playerAnswers.length <= game.currentQuestionIndex) {
