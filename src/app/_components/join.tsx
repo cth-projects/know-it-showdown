@@ -11,6 +11,7 @@ export default function Join() {
   const router = useRouter();
 
   const [code, setCode] = useState<string>("");
+   
 
   return (
     <Fragment>
