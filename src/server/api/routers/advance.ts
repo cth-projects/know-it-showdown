@@ -9,6 +9,8 @@ import type {
   PresenterGameAdvanceEvent,
 } from "@/types";
 
+const DEFAULT_ANSWER = 0;
+
 export const advanceRouter = createTRPCRouter({
   advance: publicProcedure
     .input(
@@ -40,7 +42,6 @@ export const advanceRouter = createTRPCRouter({
       // Check for missing player answers and add defaults
       if (nextState === Game0To100State.RESULT) {
         const currentQuestion = game.questions[game.currentQuestionIndex];
-        const DEFAULT_ANSWER = 0;
 
         for (const player of game.players) {
           if (player.playerAnswers.length <= game.currentQuestionIndex) {
@@ -62,7 +63,7 @@ export const advanceRouter = createTRPCRouter({
         }
       }
 
-      let updateData: Prisma.Game0To100UpdateInput = {
+      const updateData: Prisma.Game0To100UpdateInput = {
         gameState: nextState,
       };
 
@@ -70,7 +71,7 @@ export const advanceRouter = createTRPCRouter({
         game.gameState === Game0To100State.RESULT &&
         nextState === Game0To100State.QUESTION
       ) {
-        updateData = { currentQuestionIndex: game.currentQuestionIndex + 1 };
+        updateData.currentQuestionIndex = game.currentQuestionIndex + 1;
       }
 
       const updatedGame = await ctx.db.game0To100.update({
@@ -184,7 +185,8 @@ async function broadcastResultEvents(
     },
     playerResults: updatedGame.players.map((player) => {
       const playerAnswer =
-        player.playerAnswers[updatedGame.currentQuestionIndex] ?? 50;
+        player.playerAnswers[updatedGame.currentQuestionIndex] ??
+        DEFAULT_ANSWER;
       const isCorrect = playerAnswer === currentQuestion.answer;
 
       return {
