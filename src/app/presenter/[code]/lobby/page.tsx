@@ -4,6 +4,7 @@ import { HydrateClient } from "@/trpc/server";
 
 import GameCode from "src/app/_components/displayGameCode"
 import PlayerList from "@/app/_components/playerList";
+import TestLeaderboardButton from "@/app/_components/gameLeaderboard/testLeaderBoardButton";
 
 export default function LobbyPage() {
     return (
@@ -19,6 +20,7 @@ export default function LobbyPage() {
                     <GameCode />
                 </div>
                 <PlayerList/>
+                <TestLeaderboardButton/>
             </main>
         </HydrateClient>
     )

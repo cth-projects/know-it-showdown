@@ -25,7 +25,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${geist.variable}`}>
-      <body>
+      <body className="bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white min-h-screen">
         <PusherProvider>
           <ThemeProvider
             attribute="class"

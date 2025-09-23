@@ -1,38 +1,54 @@
-# Setup Know-it Showdown
+# Know-it Showdown
 
-- [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
+## Daily Development
 
-Run `start-database.sh` before running project.
-Run `bun db:migrate` before running project.
-Run `bun db:studio` to visually see the database.
-Run `bun dev` to start the project.
+Every time you start working on the project:
 
-# Create T3 App
+- `bun setup` - Installs dependencies, runs migrations, and seeds database
+- `bun dev` - Runs the project in dev environment
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Before pushing commits:
 
-## What's next? How do I make an app with this?
+- `bun lint` - Runs linter, fix lint errors before pushing.
+- `bun run build` Compiles and Builds the project, fix build errors before pushing.
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## First Time Setup
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+**Prerequisites:**
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+- [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/) - Install and start Docker Desktop
+- [Bun](https://bun.sh/) - JavaScript runtime and package manager
+- [ESLint](vscode:extension/dbaeumer.vscode-eslint) and [Prettier](vscode:extension/esbenp.prettier-vscode) VS Code extensions
 
-## Learn More
+**Initial Setup:**
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+1. Install and start Docker Desktop
+2. Run `./start-database.sh` to start the database
+3. Run `bun setup` to install dependencies, run migrations, and seed the database
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+## Useful Commands
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+- `bun db:studio` - Open Prisma Studio to visually browse the database
+- `bun db:seed` - Reseed database with sample data (safe to run multiple times)
+- `bun db:migrate` - Run database migrations
+- `bun db:generate` - Generate Prisma client after schema changes
 
-## How do I deploy this?
+## VS Code Extensions
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+**Recommended:**
+
+- [ES7+ React/Redux/React-Native snippets](vscode:extension/dsznajder.es7-react-js-snippets) - React code snippets
+- [Tailwind CSS IntelliSense](vscode:extension/bradlc.vscode-tailwindcss) - Tailwind autocomplete
+- [Prisma](vscode:extension/Prisma.prisma) - Prisma schema support
+
+## Tech Stack
+
+This project uses the [T3 Stack](https://create.t3.gg/) with:
+
+- [Next.js](https://nextjs.org) - React framework
+- [Prisma](https://prisma.io) - Database ORM
+- [Tailwind CSS](https://tailwindcss.com) - Styling
+- [tRPC](https://trpc.io) - Type-safe APIs
+- [NextAuth.js](https://next-auth.js.org) - Authentication
+
+**Learn more:** [T3 Stack Documentation](https://create.t3.gg/) | [T3 Discord](https://t3.gg/discord)

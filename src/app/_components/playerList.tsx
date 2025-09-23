@@ -34,7 +34,7 @@ export default function playerlist() {
       channel.unbind_all();
       unsubscribe(`presenter-${code}`);
     };
-  }, [subscribe, unsubscribe]);
+  }, [subscribe, unsubscribe, code]);
 
   return (
     <div>
@@ -42,12 +42,16 @@ export default function playerlist() {
         <div className="grid justify-items-center p-4">
           <h4 className="mb-5 text-sm leading-none font-medium">Players</h4>
 
-          {players ? players.map((item) => (
-            <Fragment key={item}>
-              <div className="text-sm">{item}</div>
-              <Separator className="my-2" />
-            </Fragment>
-          )) : <div>Loading...</div>}
+          {players ? (
+            players.map((item) => (
+              <Fragment key={item}>
+                <div className="text-sm">{item}</div>
+                <Separator className="my-2" />
+              </Fragment>
+            ))
+          ) : (
+            <div>Loading...</div>
+          )}
         </div>
       </ScrollArea>
       <div>Player count: {players?.length ?? 0}</div>
