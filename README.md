@@ -4,10 +4,13 @@
 
 Every time you start working on the project:
 
-```bash
-bun setup # Installs dependencies, runs migrations, and seeds database
-bun dev # Runs the project
-```
+- `bun setup` - Installs dependencies, runs migrations, and seeds database
+- `bun dev` - Runs the project in dev environment
+
+Before pushing commits:
+
+- `bun lint` - Runs linter, fix lint errors before pushing.
+- `bun run build` Compiles and Builds the project, fix build errors before pushing.
 
 ## First Time Setup
 
