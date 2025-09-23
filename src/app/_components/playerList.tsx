@@ -6,42 +6,44 @@ import { usePusherContext } from "@/contexts/PusherContext";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
-export default function playerlist() {
-    const { subscribe, unsubscribe } = usePusherContext();
-    const [players, setPlayers] = useState<string[]>(["janne", "loffe", "carlsson"])
-    const param = useParams();
-    const code = param.code as string;
+export default function Playerlist() {
+  const { subscribe, unsubscribe } = usePusherContext();
+  const [players, setPlayers] = useState<string[]>([
+    "janne",
+    "loffe",
+    "carlsson",
+  ]);
+  const param = useParams();
+  const code = param.code as string;
 
-    useEffect(() => {
+  useEffect(() => {
     const channel = subscribe(`presenter-${code}`);
 
-    channel.bind("playerlist-updated", (new_playerlist:string[]) => {
-        setPlayers(new_playerlist);
+    channel.bind("playerlist-updated", (new_playerlist: string[]) => {
+      setPlayers(new_playerlist);
     });
 
     return () => {
-        channel.unbind_all();
-        unsubscribe(`presenter-${code}`);
+      channel.unbind_all();
+      unsubscribe(`presenter-${code}`);
     };
-    }, [subscribe, unsubscribe]);
-    
+  }, [subscribe, unsubscribe, code]);
+
   return (
     <div>
-    <ScrollArea className="h-[200px] w-[400px] rounded-md border">
-      <div className="grid justify-items-center p-4">
-        <h4 className="mb-5 text-sm leading-none font-medium">Players</h4>
-        
-        {players.map((item) => (
-          <Fragment key={item}>
-            <div className="text-sm">{item}</div>
-            <Separator className="my-2" />
-          </Fragment>
-        ))}
-      </div>
-    </ScrollArea>
-    <div>
-        Player count: {players.length}
+      <ScrollArea className="h-[200px] w-[400px] rounded-md border">
+        <div className="grid justify-items-center p-4">
+          <h4 className="mb-5 text-sm leading-none font-medium">Players</h4>
+
+          {players.map((item) => (
+            <Fragment key={item}>
+              <div className="text-sm">{item}</div>
+              <Separator className="my-2" />
+            </Fragment>
+          ))}
+        </div>
+      </ScrollArea>
+      <div>Player count: {players.length}</div>
     </div>
-    </div>
-  )
+  );
 }

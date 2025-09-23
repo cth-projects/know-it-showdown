@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { pusherClient } from "@/lib/pusher-client";
-import { Channel } from "pusher-js";
+import { type Channel } from "pusher-js";
 
 interface PusherContextType {
   pusher: typeof pusherClient;
