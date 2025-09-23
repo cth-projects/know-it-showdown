@@ -83,7 +83,7 @@ export const answersRouter = createTRPCRouter({
 
       // TODO: schema/interface or something for this?
       await pusher.trigger(`presenter-${gameCode}`, "player-answered", {
-        playerName,
+        name: playerName,
         questionIndex: currentQuestionIndex,
       });
     }),
