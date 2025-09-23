@@ -2,81 +2,94 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Game {
-    gameCode  String   @id
-    upstashId String   @unique
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  gameCode  String   @id
+  upstashId String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    game0To100 Game0To100?
+  game0To100 Game0To100?
 
-    @@index([upstashId])
+  @@index([upstashId])
 }
 
 // Example
 model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([name])
+  @@index([name])
 }
 
 // Game 0-100 models *******************************************************************
 enum Game0To100State {
-    LOBBY
-    QUESTION
-    RESULT
-    FINAL_RESULT
+  LOBBY
+  QUESTION
+  RESULT
+  FINAL_RESULT
+}
+
+enum Game0To100CategoryType {
+  DEFAULT
+  HEALTH
+  EDUCATION
+  WATER
+  ENERGY
+  EMPLOYMENT
+  TECHNOLOGY
+  URBAN_DEVELOPMENT
+  ENVIRONMENT
 }
 
 model Game0To100 {
-    gameCode             String          @id
-    gameState            Game0To100State @default(LOBBY)
-    currentQuestionIndex Int             @default(0)
-    createdAt            DateTime        @default(now())
-    updatedAt            DateTime        @updatedAt
+  gameCode             String          @id
+  gameState            Game0To100State @default(LOBBY)
+  currentQuestionIndex Int             @default(0)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
 
-    game      Game                 @relation(fields: [gameCode], references: [gameCode], onDelete: Cascade)
-    players   Game0To100Player[]
-    questions Game0To100Question[]
+  game      Game                 @relation(fields: [gameCode], references: [gameCode], onDelete: Cascade)
+  players   Game0To100Player[]
+  questions Game0To100Question[]
 }
 
 model Game0To100Player {
-    name          String
-    gameCode      String
-    score         Int    @default(0)
-    playerAnswers Int[]
+  name          String
+  gameCode      String
+  score         Int    @default(0)
+  playerAnswers Int[]
 
-    game Game0To100 @relation(fields: [gameCode], references: [gameCode], onDelete: Cascade)
+  game Game0To100 @relation(fields: [gameCode], references: [gameCode], onDelete: Cascade)
 
-    @@id([name, gameCode])
+  @@id([name, gameCode])
 }
 
 model Game0To100Category {
-    name String @id
+  name String @id
+  // TODO: add category info used to display info about the UN goal
 
-    questions Game0To100Question[]
+  questions Game0To100Question[]
 }
 
 model Game0To100Question {
-    id           Int      @id @default(autoincrement())
-    question     String   @unique
-    answer       Int
-    categoryName String   @map("category")
-    updatedAt    DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  question     String   @unique
+  answer       Int
+  categoryName String   @map("category")
+  updatedAt    DateTime @updatedAt
 
-    category Game0To100Category @relation(fields: [categoryName], references: [name])
-    games    Game0To100[]
+  category Game0To100Category @relation(fields: [categoryName], references: [name])
+  games    Game0To100[]
 }
 
 // ***************************************************************************************
