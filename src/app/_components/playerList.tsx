@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { api } from "@/trpc/react";
 
-export default function playerlist() {
+export default function Playerlist() {
   const param = useParams();
 
   const code = param.code as string;

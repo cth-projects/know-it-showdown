@@ -17,10 +17,15 @@ export const gameRouter = createTRPCRouter({
       const game = await ctx.db.game.create({
         data: {
           gameCode: code,
-          gameState: "LOBBY",
+          upstashId: "1", // TODO: use actual id...
         },
       });
-      await ctx.db.player.create({
+      await ctx.db.game0To100.create({
+        data: {
+          gameCode: code,
+        },
+      });
+      await ctx.db.game0To100Player.create({
         data: {
           name: input.playerName,
           gameCode: game.gameCode,
@@ -46,14 +51,14 @@ export const gameRouter = createTRPCRouter({
           message: `No game with code '${input.gameCode}'`,
         });
 
-      await ctx.db.player.create({
+      await ctx.db.game0To100Player.create({
         data: {
           name: input.playerName,
           gameCode: input.gameCode,
         },
       });
 
-      const allPlayers = await ctx.db.player.findMany({
+      const allPlayers = await ctx.db.game0To100Player.findMany({
         where: { gameCode: input.gameCode },
       });
 
@@ -75,7 +80,7 @@ export const gameRouter = createTRPCRouter({
   getPlayers: publicProcedure
     .input(z.object({ gameCode: z.string().min(1) }))
     .query(async ({ input, ctx }) => {
-      const players = await ctx.db.player.findMany({
+      const players = await ctx.db.game0To100Player.findMany({
         where: { gameCode: input.gameCode },
         select: { name: true },
       });
