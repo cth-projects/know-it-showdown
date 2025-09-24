@@ -152,8 +152,8 @@ async function broadcastQuestionEvents(
   };
 
   await Promise.all([
-    pusher.trigger(`player-${gameCode}`, "game-advance", playerEvent),
-    pusher.trigger(`presenter-${gameCode}`, "game-advance", presenterEvent),
+    pusher.trigger("player-"+gameCode, "game-advance", playerEvent),
+    pusher.trigger("presenter-"+gameCode, "presenter-advanced", presenterEvent),
   ]);
 }
 
@@ -201,7 +201,7 @@ async function broadcastResultEvents(
   };
 
   await pusher.trigger(
-    `presenter-${gameCode}`,
+    "presenter-"+gameCode,
     "presenter-advanced",
     presenterEvent,
   );
@@ -249,7 +249,7 @@ async function broadcastFinalResultEvents(
   };
 
   await pusher.trigger(
-    `presenter-${gameCode}`,
+    "presenter-"+gameCode,
     "presenter-advanced",
     presenterEvent,
   );

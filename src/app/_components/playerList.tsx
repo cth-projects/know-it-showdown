@@ -24,7 +24,7 @@ export default function Playerlist() {
   }, [data]);
 
   useEffect(() => {
-    const channel = subscribe(`presenter-${code}`);
+    const channel = subscribe("presenter-"+code);
 
     channel.bind("playerlist-updated", (new_playerlist: string[]) => {
       setPlayers(new_playerlist);
@@ -32,7 +32,7 @@ export default function Playerlist() {
 
     return () => {
       channel.unbind_all();
-      unsubscribe(`presenter-${code}`);
+      unsubscribe("presenter-"+code);
     };
   }, [subscribe, unsubscribe, code]);
 
@@ -58,3 +58,4 @@ export default function Playerlist() {
     </div>
   );
 }
+

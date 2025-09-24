@@ -81,10 +81,20 @@ export const answersRouter = createTRPCRouter({
         },
       });
 
-      // TODO: schema/interface or something for this?
-      await pusher.trigger(`presenter-${gameCode}`, "player-answered", {
-        name: playerName,
-        questionIndex: currentQuestionIndex,
-      });
+      try {
+        await pusher.trigger("presenter-" + gameCode, "player-answered", {
+          name: playerName,
+          questionIndex: currentQuestionIndex,
+        });
+
+        return { success: true };
+      } catch (error) {
+        console.error("Pusher error:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to send Pusher event",
+          cause: error,
+        });
+      }
     }),
 });

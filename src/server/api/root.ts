@@ -4,6 +4,7 @@ import { testRouter } from "./routers/test";
 import { answersRouter } from "./routers/answers";
 import { gameRouter } from "./routers/game";
 import { advanceRouter } from "./routers/advance";
+import { advanceRouter } from "./routers/advance";
 
 /**
  * This is the primary router for your server.
