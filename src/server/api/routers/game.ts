@@ -17,7 +17,7 @@ export const gameRouter = createTRPCRouter({
       const game = await ctx.db.game.create({
         data: {
           gameCode: code,
-          upstashId: "1", // TODO: use actual id...
+          upstashId: nanoid(), // TODO: use actual id...
         },
       });
       await ctx.db.game0To100.create({
@@ -108,7 +108,7 @@ export const gameRouter = createTRPCRouter({
         });
       if (game.gameState === "QUESTION" || "RESULT") {
         const result = (await ctx.db.game0To100Question.findFirst({
-          where: { id: game.currentQuestionIndex +1 },
+          where: { id: game.currentQuestionIndex + 1 },
           select: { question: true, answer: true },
         })) ?? { question: null, answer: null };
         return {
