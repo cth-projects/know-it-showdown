@@ -5,7 +5,6 @@ import { CheckCircle, Circle } from "lucide-react";
 import { usePusherContext } from "@/contexts/PusherContext";
 import { useParams } from "next/navigation";
 import { api } from "@/trpc/react";
-import { Button } from "@/components/ui/button";
 import type { PresenterGameAdvanceEvent } from "@/types";
 
 interface PlayerStatus {
@@ -24,7 +23,7 @@ const usePersistedPlayerStatus = (gameCode: string) => {
     const saved = localStorage.getItem(storageKey);
     if (saved) {
       try {
-        const parsedPlayers = JSON.parse(saved);
+        const parsedPlayers = JSON.parse(saved) as PlayerStatus[];
         setPlayers(parsedPlayers);
       } catch (error) {
         console.error("Failed to parse saved player status:", error);
@@ -77,7 +76,7 @@ export default function SimpleQuestionList() {
   const { subscribe, unsubscribe } = usePusherContext();
   const param = useParams();
   const code = param.code as string;
-  const mutation = api.answers.submit.useMutation();
+  /* const mutation = api.answers.submit.useMutation(); */
 
   const { data } = api.game.getPlayers.useQuery({ gameCode: code });
   const { players, updatePlayerStatus, initializePlayers, isClient } =
@@ -87,7 +86,7 @@ export default function SimpleQuestionList() {
     if (data && data.length > 0) {
       initializePlayers(data.map((p) => ({ name: p.name })));
     }
-  }, [data]);
+  }, [data, initializePlayers]);
 
   useEffect(() => {
     const channelName = "presenter-" + code;
