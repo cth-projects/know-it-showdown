@@ -94,22 +94,18 @@ async function handleGameBroadcasting(
     include: { players: true; questions: true };
   }>,
 ) {
-  try {
-    switch (nextState) {
-      case Game0To100State.QUESTION:
-        await broadcastQuestionEvents(gameCode, updatedGame);
-        break;
+  switch (nextState) {
+    case Game0To100State.QUESTION:
+      await broadcastQuestionEvents(gameCode, updatedGame);
+      break;
 
-      case Game0To100State.RESULT:
-        await broadcastResultEvents(gameCode, updatedGame);
-        break;
+    case Game0To100State.RESULT:
+      await broadcastResultEvents(gameCode, updatedGame);
+      break;
 
-      case Game0To100State.FINAL_RESULT:
-        await broadcastFinalResultEvents(gameCode, updatedGame);
-        break;
-    }
-  } catch (pusherError) {
-    console.error("Pusher broadcast error:", pusherError);
+    case Game0To100State.FINAL_RESULT:
+      await broadcastFinalResultEvents(gameCode, updatedGame);
+      break;
   }
 }
 
@@ -152,8 +148,12 @@ async function broadcastQuestionEvents(
   };
 
   await Promise.all([
-    pusher.trigger("player-"+gameCode, "game-advance", playerEvent),
-    pusher.trigger("presenter-"+gameCode, "presenter-advanced", presenterEvent),
+    pusher.trigger("player-" + gameCode, "game-advance", playerEvent),
+    pusher.trigger(
+      "presenter-" + gameCode,
+      "presenter-advanced",
+      presenterEvent,
+    ),
   ]);
 }
 
@@ -201,7 +201,7 @@ async function broadcastResultEvents(
   };
 
   await pusher.trigger(
-    "presenter-"+gameCode,
+    "presenter-" + gameCode,
     "presenter-advanced",
     presenterEvent,
   );
@@ -249,7 +249,7 @@ async function broadcastFinalResultEvents(
   };
 
   await pusher.trigger(
-    "presenter-"+gameCode,
+    "presenter-" + gameCode,
     "presenter-advanced",
     presenterEvent,
   );

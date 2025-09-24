@@ -1,23 +1,16 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 
 import { PrismaClient } from "@prisma/client";
-import { Game0To100State } from "@prisma/client";
+import { Game0To100State, Game0To100CategoryType } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log("Seeding database...");
 
-  const categories = [
-    "Math",
-    "Science",
-    "Geography",
-    "History",
-    "Sports",
-    "General",
-    "Biology",
-    "Physics",
-  ];
+  const categories = Object.values(Game0To100CategoryType).filter(
+    (category) => category !== Game0To100CategoryType.DEFAULT,
+  );
 
   for (const categoryName of categories) {
     await prisma.game0To100Category.upsert({
@@ -29,95 +22,134 @@ async function main() {
 
   const sampleQuestions = [
     {
-      question: "What percentage of Earth's surface is covered by water?",
-      answer: 71,
-      categoryName: "Geography",
-    },
-    {
-      question: "At what temperature does water freeze in Celsius?",
-      answer: 0,
-      categoryName: "Science",
-    },
-    {
-      question: "How many minutes are in one hour?",
-      answer: 60,
-      categoryName: "Math",
-    },
-    {
       question: "What percentage of the human body is approximately water?",
       answer: 60,
-      categoryName: "Biology",
+      categoryName: Game0To100CategoryType.HEALTH,
     },
-    {
-      question: "In what year did World War II end? (Enter last two digits)",
-      answer: 45,
-      categoryName: "History",
-    },
-    {
-      question: "How many states are there in the United States?",
-      answer: 50,
-      categoryName: "Geography",
-    },
-    { question: "What is 25% of 80?", answer: 20, categoryName: "Math" },
     {
       question:
         "What is the normal human body temperature in Fahrenheit? (Rounded)",
       answer: 98,
-      categoryName: "Biology",
+      categoryName: Game0To100CategoryType.HEALTH,
+    },
+    {
+      question: "What percentage of adults globally are overweight or obese?",
+      answer: 39,
+      categoryName: Game0To100CategoryType.HEALTH,
+    },
+    {
+      question: "What percentage of the world's population can read and write?",
+      answer: 86,
+      categoryName: Game0To100CategoryType.EDUCATION,
     },
     {
       question:
-        "How many players are on a basketball team on the court at once?",
-      answer: 5,
-      categoryName: "Sports",
+        "How many years of primary education do most countries provide?",
+      answer: 6,
+      categoryName: Game0To100CategoryType.EDUCATION,
     },
     {
-      question: "What percentage of Earth's atmosphere is nitrogen? (Rounded)",
-      answer: 78,
-      categoryName: "Science",
+      question: "What percentage of children globally complete primary school?",
+      answer: 91,
+      categoryName: Game0To100CategoryType.EDUCATION,
+    },
+    {
+      question: "What percentage of Earth's surface is covered by water?",
+      answer: 71,
+      categoryName: Game0To100CategoryType.WATER,
+    },
+    {
+      question:
+        "What percentage of adults globally have access to clean drinking water?",
+      answer: 90,
+      categoryName: Game0To100CategoryType.WATER,
+    },
+    {
+      question: "What percentage of Earth's water is freshwater?",
+      answer: 3,
+      categoryName: Game0To100CategoryType.WATER,
+    },
+    {
+      question:
+        "What percentage of global energy comes from renewable sources?",
+      answer: 30,
+      categoryName: Game0To100CategoryType.ENERGY,
     },
     {
       question: "At what temperature does water boil in Celsius?",
       answer: 100,
-      categoryName: "Physics",
-    },
-    {
-      question: "How many weeks are in a year? (Rounded)",
-      answer: 52,
-      categoryName: "General",
-    },
-    { question: "What is 8 x 9?", answer: 72, categoryName: "Math" },
-    {
-      question: "How many continents are there?",
-      answer: 7,
-      categoryName: "Geography",
-    },
-    {
-      question: "What percentage of adult humans can curl their tongue?",
-      answer: 68,
-      categoryName: "Biology",
-    },
-    {
-      question: "How many chambers does a human heart have?",
-      answer: 4,
-      categoryName: "Biology",
-    },
-    { question: "What is 15% of 200?", answer: 30, categoryName: "Math" },
-    {
-      question: "How many sides does a triangle have?",
-      answer: 3,
-      categoryName: "Math",
-    },
-    {
-      question: "What is the atomic number of carbon?",
-      answer: 6,
-      categoryName: "Science",
+      categoryName: Game0To100CategoryType.ENERGY,
     },
     {
       question:
-        "How many players are on a football (soccer) team on the field?",
-      answer: 11,
-      categoryName: "Sports",
+        "What percentage of global electricity comes from fossil fuels?",
+      answer: 62,
+      categoryName: Game0To100CategoryType.ENERGY,
+    },
+    {
+      question: "What percentage of the global workforce is unemployed?",
+      answer: 6,
+      categoryName: Game0To100CategoryType.EMPLOYMENT,
+    },
+    {
+      question: "What percentage of the global workforce works in agriculture?",
+      answer: 27,
+      categoryName: Game0To100CategoryType.EMPLOYMENT,
+    },
+    {
+      question: "What is the average retirement age globally? (Rounded)",
+      answer: 64,
+      categoryName: Game0To100CategoryType.EMPLOYMENT,
+    },
+    {
+      question:
+        "What percentage of the world's population has internet access?",
+      answer: 65,
+      categoryName: Game0To100CategoryType.TECHNOLOGY,
+    },
+    {
+      question: "What percentage of the global population owns a smartphone?",
+      answer: 68,
+      categoryName: Game0To100CategoryType.TECHNOLOGY,
+    },
+    {
+      question:
+        "How many hours per day does the average person spend on their phone?",
+      answer: 7,
+      categoryName: Game0To100CategoryType.TECHNOLOGY,
+    },
+    {
+      question:
+        "What percentage of the world's population lives in urban areas?",
+      answer: 55,
+      categoryName: Game0To100CategoryType.URBAN_DEVELOPMENT,
+    },
+    {
+      question: "What percentage of global GDP is generated by cities?",
+      answer: 80,
+      categoryName: Game0To100CategoryType.URBAN_DEVELOPMENT,
+    },
+    {
+      question:
+        "How many megacities (over 10 million people) are there globally?",
+      answer: 33,
+      categoryName: Game0To100CategoryType.URBAN_DEVELOPMENT,
+    },
+    {
+      question: "What percentage of Earth's atmosphere is nitrogen? (Rounded)",
+      answer: 78,
+      categoryName: Game0To100CategoryType.ENVIRONMENT,
+    },
+    {
+      question:
+        "What percentage of global greenhouse gas emissions come from agriculture?",
+      answer: 24,
+      categoryName: Game0To100CategoryType.ENVIRONMENT,
+    },
+    {
+      question: "What percentage of the Amazon rainforest has been deforested?",
+      answer: 17,
+      categoryName: Game0To100CategoryType.ENVIRONMENT,
     },
   ];
 

@@ -10,6 +10,7 @@ export const gameRouter = createTRPCRouter({
       z.object({
         playerName: z.string().min(1),
         gameType: z.enum(["0-100"]),
+        totalQuestions: z.number().min(5).max(20).default(15),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -20,17 +21,40 @@ export const gameRouter = createTRPCRouter({
           upstashId: nanoid(), // TODO: use actual id...
         },
       });
+
+      const categories = await ctx.db.game0To100Category.findMany({
+        select: { name: true },
+      });
+
+      const questionsPerCategory = Math.ceil(
+        input.totalQuestions / categories.length,
+      );
+      const selectedQuestions: { id: number }[] = [];
+
+      // TODO: improve to get random questions not just first x questions per category
+      for (const category of categories) {
+        if (selectedQuestions.length >= input.totalQuestions) break;
+
+        const questions = await ctx.db.game0To100Question.findMany({
+          where: { categoryName: category.name },
+          take: questionsPerCategory,
+          select: { id: true },
+          orderBy: { id: "asc" },
+        });
+        selectedQuestions.push(...questions);
+      }
+
+      const finalQuestions = selectedQuestions.slice(0, input.totalQuestions);
+
       await ctx.db.game0To100.create({
         data: {
           gameCode: code,
+          questions: {
+            connect: finalQuestions,
+          },
         },
       });
-      await ctx.db.game0To100Player.create({
-        data: {
-          name: input.playerName,
-          gameCode: game.gameCode,
-        },
-      });
+
       return { gameId: game.gameCode };
     }),
 

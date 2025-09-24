@@ -75,18 +75,18 @@ model Game0To100Player {
 }
 
 model Game0To100Category {
-  name String @id
+  name Game0To100CategoryType @id
   // TODO: add category info used to display info about the UN goal
 
   questions Game0To100Question[]
 }
 
 model Game0To100Question {
-  id           Int      @id @default(autoincrement())
-  question     String   @unique
+  id           Int                    @id @default(autoincrement())
+  question     String                 @unique
   answer       Int
-  categoryName String   @map("category")
-  updatedAt    DateTime @updatedAt
+  categoryName Game0To100CategoryType @map("category")
+  updatedAt    DateTime               @updatedAt
 
   category Game0To100Category @relation(fields: [categoryName], references: [name])
   games    Game0To100[]
