@@ -22,6 +22,11 @@ export default function GamePage() {
     }
     return false;
   });
+  const [isClient, setIsClient] = useState(false); // Track client-side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   // Save to sessionStorage whenever timeIsUp changes
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -57,19 +62,23 @@ export default function GamePage() {
     const channel = subscribe(channeName);
     const eventHandler = (event: PresenterGameAdvanceEvent) => {
       if (event.newState == "QUESTION") {
-        setTimeIsUp(false);
         const endtime = Date.parse(event.timestamp) + 120 * 1000;
         setEndTimeStamp(endtime);
         setDuration(Math.floor((endtime - Date.now()) / 1000));
+        setTimeIsUp(false);
       } else if (event.newState == "RESULT") {
         setTimeIsUp(true);
         if (typeof window !== "undefined") {
           sessionStorage.removeItem(`endTimeStamp-${code}`);
+          setDuration(120);
+          setEndTimeStamp(undefined);
           sessionStorage.removeItem(`timeIsUp-${code}`);
         }
       } else if (event.newState == "FINAL_RESULT") {
         if (typeof window !== "undefined") {
           sessionStorage.removeItem(`endTimeStamp-${code}`);
+          setDuration(120);
+          setEndTimeStamp(undefined);
           sessionStorage.removeItem(`timeIsUp-${code}`);
         }
       }
@@ -80,12 +89,7 @@ export default function GamePage() {
     };
   }, [code, subscribe, unsubscribe]);
 
-  useEffect(() => {
-    if (endTimeStamp) {
-      setDuration(Math.floor((endTimeStamp - Date.now()) / 1000));
-    }
-  }, [endTimeStamp]);
-
+  if (!isClient) return null; // Prevent SSR issues
   return (
     <main className="flex flex-col items-center gap-5 p-12">
       <DisplayQuestion />

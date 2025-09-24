@@ -47,12 +47,11 @@ export default function Display() {
 
     return () => {
       channel.unbind("presenter-advanced", handlePresenterAdvanced);
-      unsubscribe(channelName);
     };
   }, [code, router, subscribe, unsubscribe]);
   return (
     <div>
-      <div className="text-7xl p-10">{question}</div>
+      <div className="p-10 text-7xl">{question}</div>
       {timeIsUp ? (
         <div className="flex flex-col items-center">
           <div className="text-5xl">Answer: {result}</div>

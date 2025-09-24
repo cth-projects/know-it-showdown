@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Circle } from "lucide-react";
@@ -46,17 +46,20 @@ const usePersistedPlayerStatus = (gameCode: string) => {
     );
   };
 
-  const initializePlayers = (newPlayers: { name: string }[]) => {
-    setPlayers((prevPlayers) => {
-      const existingStatusMap = new Map(
-        prevPlayers.map((player) => [player.name, player.answered]),
-      );
-      return newPlayers.map((player) => ({
-        name: player.name,
-        answered: existingStatusMap.get(player.name) ?? false,
-      }));
-    });
-  };
+  const initializePlayers = useCallback(
+    (newPlayers: { name: string }[]) => {
+      setPlayers((prevPlayers) => {
+        const existingStatusMap = new Map(
+          prevPlayers.map((player) => [player.name, player.answered]),
+        );
+        return newPlayers.map((player) => ({
+          name: player.name,
+          answered: existingStatusMap.get(player.name) ?? false,
+        }));
+      });
+    },
+    [setPlayers],
+  );
 
   const resetPlayerStatus = () => {
     localStorage.removeItem(storageKey);
@@ -144,7 +147,7 @@ export default function SimpleQuestionList() {
         </Badge>
 
         {/* Button to mark as answered for testing purposes */}
-{/*         <Button
+        {/*         <Button
           onClick={async () => {
             await mutation.mutateAsync({
               gameCode: code,
