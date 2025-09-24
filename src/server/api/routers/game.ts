@@ -41,15 +41,31 @@ export const gameRouter = createTRPCRouter({
         playerName: z.string().min(1, "Player name is required"),
       }),
     )
+
     .mutation(async ({ input, ctx }) => {
       const game = await ctx.db.game.findUnique({
         where: { gameCode: input.gameCode },
       });
+
       if (!game)
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `No game with code '${input.gameCode}'`,
         });
+
+      const nameTaken = await ctx.db.game0To100Player.findFirst({
+        where: {
+          name: input.playerName,
+          gameCode: input.gameCode,
+        },
+      });
+
+      if (nameTaken) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: `A player with the name '${input.playerName}' already exists in the lobby`,
+        });
+      }
 
       await ctx.db.game0To100Player.create({
         data: {
@@ -61,13 +77,6 @@ export const gameRouter = createTRPCRouter({
       const allPlayers = await ctx.db.game0To100Player.findMany({
         where: { gameCode: input.gameCode },
       });
-
-      if (allPlayers.find((p) => p.name === input.playerName)) {
-        return new TRPCError({
-          code: "CONFLICT",
-          message: `Player with name '${input.playerName}' already in game`,
-        });
-      }
 
       await pusher.trigger(
         `presenter-${input.gameCode}`,
