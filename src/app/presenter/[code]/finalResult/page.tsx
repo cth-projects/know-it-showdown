@@ -1,4 +1,4 @@
-import LeaderboardTable from "@/app/_components/gameLeaderboard/LeaderBoardTable";
+// import LeaderboardTable from "@/app/_components/gameLeaderboard/LeaderBoardTable";
 import { HydrateClient } from "@/trpc/server";
 
 interface FinalResultPageProps {
@@ -16,7 +16,7 @@ export default async function FinalResult({ params }: FinalResultPageProps) {
           </h1>
         </div>
         <div className="rounded-2xl bg-gray-900 p-6 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl">
-          <LeaderboardTable gameCode={code} showGameInfo={true} />
+          {/* <LeaderboardTable gameCode={code} showGameInfo={true} /> */}
         </div>
       </main>
     </HydrateClient>
