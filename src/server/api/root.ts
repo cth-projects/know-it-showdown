@@ -2,6 +2,7 @@ import { postRouter } from "@/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { testRouter } from "./routers/test";
 import { answersRouter } from "./routers/answers";
+import { finalResultRouter } from "./routers/finalResult";
 import { gameRouter } from "./routers/game";
 import { advanceRouter } from "./routers/advance";
 
@@ -15,6 +16,7 @@ export const appRouter = createTRPCRouter({
   test: testRouter,
   answers: answersRouter,
   game: gameRouter,
+  finalResult: finalResultRouter,
   advance: advanceRouter,
 });
 
