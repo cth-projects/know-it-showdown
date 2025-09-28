@@ -75,8 +75,11 @@ model Game0To100Player {
 }
 
 model Game0To100Category {
-  name Game0To100CategoryType @id
-  // TODO: add category info used to display info about the UN goal
+  name        Game0To100CategoryType @id
+  title       String // UN goal
+  sdgNumber   Int
+  description String
+  color       String // UN has a color for each goal
 
   questions Game0To100Question[]
 }

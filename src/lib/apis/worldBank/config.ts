@@ -1,23 +1,3 @@
-import { Game0To100CategoryType } from "@prisma/client";
-
-type QuestionMapping = {
-  template: "percentage" | "rate" | "access" | "coverage" | "share";
-  category: Game0To100CategoryType;
-  description?: string;
-  service?: string;
-  type?: string;
-  source?: string;
-};
-
-// Helper to create question mappings with defaults
-const createQuestionMapping = (mapping: QuestionMapping): QuestionMapping => ({
-  description: "DEFAULT",
-  service: "DEFAULT",
-  type: "DEFAULT",
-  source: "DEFAULT",
-  ...mapping,
-});
-
 export const WORLD_BANK_CONFIG = {
   baseUrl: "https://api.worldbank.org/v2",
   timeout: 30000,
@@ -53,9 +33,9 @@ export const WORLD_BANK_CONFIG = {
       unemploymentTotal: "SL.UEM.TOTL.ZS",
       unemploymentYouth: "SL.UEM.1524.ZS",
       laborForceParticipation: "SL.TLF.CACT.ZS",
-      employmentIndustry: "SL.EMP.WORK.IN.ZS",
-      employmentServices: "SL.EMP.WORK.SV.ZS",
-      employmentAgriculture: "SL.EMP.WORK.AG.ZS",
+      employmentIndustry: "SL.IND.EMPL.ZS",
+      employmentServices: "SL.SRV.EMPL.ZS",
+      employmentAgriculture: "SL.AGR.EMPL.ZS",
     },
     connectivity: {
       internetUsers: "IT.NET.USER.ZS",
@@ -100,140 +80,11 @@ export const WORLD_BANK_CONFIG = {
     "NZ",
   ] as const,
 
-  // Rate limiting
   rateLimiting: {
     requestsPerMinute: 100,
     burstLimit: 10,
     backoffMultiplier: 2,
   },
-} as const;
-
-// Question templates
-export const QUESTION_TEMPLATES = {
-  percentage: "What percentage of {country}'s population {description}?",
-  rate: "What is the {description} rate in {country}?",
-  access: "What percentage of people in {country} have access to {service}?",
-  coverage: "What percentage of {country}'s land area is {type}?",
-  share: "What percentage of {country}'s {category} comes from {source}?",
-} as const;
-
-// Question mappings for indicators
-export const QUESTION_MAPPINGS = {
-  // Health
-  "SH.IMM.MEAS": createQuestionMapping({
-    template: "percentage",
-    description: "are vaccinated against measles",
-    category: Game0To100CategoryType.HEALTH,
-  }),
-  "SH.IMM.POL3": createQuestionMapping({
-    template: "percentage",
-    description: "receive polio vaccination",
-    category: Game0To100CategoryType.HEALTH,
-  }),
-
-  // Education
-  "SE.ADT.LITR.ZS": createQuestionMapping({
-    template: "rate",
-    description: "adult literacy",
-    category: Game0To100CategoryType.EDUCATION,
-  }),
-  "SE.ADT.1524.LT.ZS": createQuestionMapping({
-    template: "rate",
-    description: "youth literacy (ages 15-24)",
-    category: Game0To100CategoryType.EDUCATION,
-  }),
-
-  // Water
-  "SH.H2O.BASW.ZS": createQuestionMapping({
-    template: "access",
-    service: "clean drinking water",
-    category: Game0To100CategoryType.WATER,
-  }),
-
-  // Energy
-  "EG.ELC.ACCS.ZS": createQuestionMapping({
-    template: "access",
-    service: "electricity",
-    category: Game0To100CategoryType.ENERGY,
-  }),
-  "EG.ELC.ACCS.RU.ZS": createQuestionMapping({
-    template: "access",
-    service: "electricity (rural areas)",
-    category: Game0To100CategoryType.ENERGY,
-  }),
-  "EG.ELC.ACCS.UR.ZS": createQuestionMapping({
-    template: "access",
-    service: "electricity (urban areas)",
-    category: Game0To100CategoryType.ENERGY,
-  }),
-  "EG.FEC.RNEW.ZS": createQuestionMapping({
-    template: "share",
-    category: Game0To100CategoryType.ENERGY,
-    source: "renewable sources",
-  }),
-
-  // Employment
-  "SL.UEM.TOTL.ZS": createQuestionMapping({
-    template: "rate",
-    description: "unemployment",
-    category: Game0To100CategoryType.EMPLOYMENT,
-  }),
-  "SL.UEM.1524.ZS": createQuestionMapping({
-    template: "rate",
-    description: "youth unemployment (ages 15-24)",
-    category: Game0To100CategoryType.EMPLOYMENT,
-  }),
-  "SL.TLF.CACT.ZS": createQuestionMapping({
-    template: "rate",
-    description: "labor force participation",
-    category: Game0To100CategoryType.EMPLOYMENT,
-  }),
-  "SL.EMP.WORK.IN.ZS": createQuestionMapping({
-    template: "percentage",
-    description: "work in industry",
-    category: Game0To100CategoryType.EMPLOYMENT,
-  }),
-  "SL.EMP.WORK.SV.ZS": createQuestionMapping({
-    template: "percentage",
-    description: "work in services",
-    category: Game0To100CategoryType.EMPLOYMENT,
-  }),
-  "SL.EMP.WORK.AG.ZS": createQuestionMapping({
-    template: "percentage",
-    description: "work in agriculture",
-    category: Game0To100CategoryType.EMPLOYMENT,
-  }),
-
-  // Connectivity
-  "IT.NET.USER.ZS": createQuestionMapping({
-    template: "percentage",
-    description: "use the internet",
-    category: Game0To100CategoryType.TECHNOLOGY,
-  }),
-
-  // Urban
-  "SP.URB.TOTL.IN.ZS": createQuestionMapping({
-    template: "percentage",
-    description: "live in urban areas",
-    category: Game0To100CategoryType.URBAN_DEVELOPMENT,
-  }),
-
-  // Environment
-  "AG.LND.FRST.ZS": createQuestionMapping({
-    template: "coverage",
-    type: "covered by forests",
-    category: Game0To100CategoryType.ENVIRONMENT,
-  }),
-  "ER.LND.PTLD.ZS": createQuestionMapping({
-    template: "coverage",
-    type: "protected terrestrial areas",
-    category: Game0To100CategoryType.ENVIRONMENT,
-  }),
-  "AG.LND.AGRI.ZS": createQuestionMapping({
-    template: "coverage",
-    type: "agricultural land",
-    category: Game0To100CategoryType.ENVIRONMENT,
-  }),
 } as const;
 
 // Helper functions
@@ -253,24 +104,72 @@ export function generateQuestion(
   indicatorCode: string,
   countryName: string,
 ): string {
-  const mapping =
-    QUESTION_MAPPINGS[indicatorCode as keyof typeof QUESTION_MAPPINGS];
+  const questionMap: Record<string, (country: string) => string> = {
+    // Health
+    "SH.IMM.MEAS": (country) =>
+      `What percentage of children in ${country} are vaccinated against measles?`,
+    "SH.IMM.POL3": (country) =>
+      `What percentage of children in ${country} receive polio vaccination?`,
 
-  if (!mapping) {
-    return `What is the value of indicator ${indicatorCode} in ${countryName}?`;
+    // Education
+    "SE.ADT.LITR.ZS": (country) =>
+      `What is the adult literacy rate in ${country}?`,
+    "SE.ADT.1524.LT.ZS": (country) =>
+      `What is the youth literacy rate in ${country}?`,
+
+    // Water
+    "SH.H2O.BASW.ZS": (country) =>
+      `What percentage of people in ${country} have access to clean drinking water?`,
+
+    // Energy
+    "EG.ELC.ACCS.ZS": (country) =>
+      `What percentage of the population in ${country} has access to electricity?`,
+    "EG.ELC.ACCS.RU.ZS": (country) =>
+      `What percentage of rural areas in ${country} have access to electricity?`,
+    "EG.ELC.ACCS.UR.ZS": (country) =>
+      `What percentage of urban areas in ${country} have access to electricity?`,
+    "EG.FEC.RNEW.ZS": (country) =>
+      `What percentage of ${country}'s energy consumption comes from renewable sources?`,
+
+    // Employment
+    "SL.UEM.TOTL.ZS": (country) =>
+      `What is the unemployment rate in ${country}?`,
+    "SL.UEM.1524.ZS": (country) =>
+      `What is the youth unemployment rate in ${country}?`,
+    "SL.TLF.CACT.ZS": (country) =>
+      `What is the labor force participation rate in ${country}?`,
+    "SL.IND.EMPL.ZS": (country) =>
+      `What percentage of people in ${country} work in industry?`,
+    "SL.SRV.EMPL.ZS": (country) =>
+      `What percentage of people in ${country} work in services?`,
+    "SL.AGR.EMPL.ZS": (country) =>
+      `What percentage of people in ${country} work in agriculture?`,
+
+    // Technology
+    "IT.NET.USER.ZS": (country) =>
+      `What percentage of people in ${country} use the internet?`,
+
+    // Urban
+    "SP.URB.TOTL.IN.ZS": (country) =>
+      `What percentage of ${country}'s population lives in urban areas?`,
+
+    // Environment
+    "AG.LND.FRST.ZS": (country) =>
+      `What percentage of ${country}'s land area is covered by forests?`,
+    "ER.LND.PTLD.ZS": (country) =>
+      `What percentage of ${country}'s land area is protected terrestrial areas?`,
+    "AG.LND.AGRI.ZS": (country) =>
+      `What percentage of ${country}'s land area is agricultural land?`,
+  };
+
+  const questionFn = questionMap[indicatorCode];
+
+  if (questionFn) {
+    return questionFn(countryName);
   }
 
-  const template = QUESTION_TEMPLATES[mapping.template];
-
-  return template
-    .replace("{country}", countryName)
-    .replace("{description}", mapping.description ?? "")
-    .replace("{service}", mapping.service ?? "")
-    .replace("{type}", mapping.type ?? "")
-    .replace("{category}", mapping.category ?? Game0To100CategoryType.DEFAULT)
-    .replace("{source}", mapping.source ?? "");
+  return `What is the value for indicator ${indicatorCode} in ${countryName}?`;
 }
 
 export type IndicatorCategory = keyof typeof WORLD_BANK_CONFIG.indicators;
-export type QuestionTemplate = keyof typeof QUESTION_TEMPLATES;
 export type CountryCode = (typeof WORLD_BANK_CONFIG.countries)[number];

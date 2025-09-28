@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "setup": "bun install && bun db:migrate && bun db:seed",
+    "test:worldbank": "bun scripts/test-worldbank.ts",
     "build": "next build",
     "check": "next lint && tsc --noEmit",
     "db:generate": "prisma migrate dev",
