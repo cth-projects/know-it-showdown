@@ -91,7 +91,7 @@ export const gameRouter = createTRPCRouter({
         });
       }
 
-      await ctx.db.game0To100Player.create({
+      const player = await ctx.db.game0To100Player.create({
         data: {
           name: input.playerName,
           gameCode: input.gameCode,
@@ -108,7 +108,7 @@ export const gameRouter = createTRPCRouter({
         allPlayers.map((p) => p.name),
       );
 
-      return { gameId: input.gameCode };
+      return { gameId: input.gameCode, player };
     }),
   getPlayers: publicProcedure
     .input(z.object({ gameCode: z.string().min(1) }))

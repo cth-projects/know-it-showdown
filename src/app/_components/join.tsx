@@ -46,16 +46,12 @@ export default function Join() {
 
   const joinGameMutation = api.game.joinGame.useMutation({
     onSuccess: (data) => {
-      if (data instanceof TRPCError) {
-        alert(data.message);
-        return;
-      }
-
-      if (data.gameId) {
-        router.push(`/game/${data.gameId}`);
+      if (data.gameId && data.player) {
+        router.push(`/game/${data.gameId}?playerName=${(data.player.name)}`);
       }
     },
   });
+
 
   return (
     <Fragment>

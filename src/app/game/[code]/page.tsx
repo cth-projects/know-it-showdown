@@ -1,26 +1,23 @@
 "use client";
-
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "@/trpc/react";
 import { Button } from "@/components/ui/button";
 import { usePusherContext } from "@/contexts/PusherContext";
-import JoinGameForm from "@/components/game/JoinGameForm";
 import PlayerList from "@/app/_components/playerList";
 
 export default function GamePage() {
   const params = useParams();
   const code = params.code as string;
 
-  const [hasJoined, setHasJoined] = useState(false);
-  const [playerName, setPlayerName] = useState("");
+  const searchParams = useSearchParams();
+  const playerName = searchParams.get("playerName");
 
   const { subscribe, unsubscribe } = usePusherContext();
   const testPusherMutation = api.test.pusher.useMutation();
 
   useEffect(() => {
     const channel = subscribe("test");
-
     channel.bind("test-event", (data: { name: string; timestamp: number }) => {
       console.log("Got event:", data);
     });
@@ -31,16 +28,8 @@ export default function GamePage() {
     };
   }, [subscribe, unsubscribe]);
 
-  const handleJoinGame = async (name: string) => {
-    console.log(`Mock: ${name} joining game ${code}`);
-
-    setPlayerName(name);
-    setHasJoined(true);
-  };
-
   const handleLeaveGame = () => {
-    setHasJoined(false);
-    setPlayerName("");
+    window.history.back(); // moves one page back for now, doesnt change a players status in the database
   };
 
   return (
@@ -50,18 +39,14 @@ export default function GamePage() {
           <h1 className="mb-2 text-4xl font-bold">Game Room</h1>
           <p className="text-xl text-gray-300">Code: {code}</p>
         </div>
-        {!hasJoined ? (
-          <>
-            <JoinGameForm onJoinGame={handleJoinGame} />
-          </>
-        ) : (
+
+        {playerName ? (
           <>
             <p className="text-lg">
               Welcome,{" "}
               <span className="text-[hsl(280,100%,70%)]">{playerName}</span>!
               Waiting for game to start.
             </p>
-
             <Button
               onClick={handleLeaveGame}
               variant="outline"
@@ -70,11 +55,19 @@ export default function GamePage() {
               Leave Game
             </Button>
           </>
+        ) : (
+          <div className="text-center">
+            <Button onClick={() => window.history.back()} variant="outline">
+              Go Back
+            </Button>
+          </div>
         )}
       </div>
+
       <div className="mt-8 flex justify-center">
         <PlayerList />
       </div>
+
       <div className="mt-8 flex justify-center">
         <Button
           onClick={async () => {
