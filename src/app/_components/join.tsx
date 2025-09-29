@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/select";
 
 import { api } from "@/trpc/react";
-import { TRPCError } from "@trpc/server";
 
 export enum GameType {
   ZERO_TO_HUNDRED = "0-100",
@@ -47,11 +46,10 @@ export default function Join() {
   const joinGameMutation = api.game.joinGame.useMutation({
     onSuccess: (data) => {
       if (data.gameId && data.player) {
-        router.push(`/game/${data.gameId}?playerName=${(data.player.name)}`);
+        router.push(`/game/${data.gameId}?playerName=${data.player.name}`);
       }
     },
   });
-
 
   return (
     <Fragment>

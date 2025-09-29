@@ -1,6 +1,6 @@
 "use client";
 import { useParams, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { api } from "@/trpc/react";
 import { Button } from "@/components/ui/button";
 import { usePusherContext } from "@/contexts/PusherContext";
