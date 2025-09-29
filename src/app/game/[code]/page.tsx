@@ -1,10 +1,8 @@
 "use client";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { api } from "@/trpc/react";
 import { Button } from "@/components/ui/button";
 import { usePusherContext } from "@/contexts/PusherContext";
-import PlayerList from "@/app/_components/playerList";
 
 export default function GamePage() {
   const params = useParams();
@@ -14,7 +12,6 @@ export default function GamePage() {
   const playerName = searchParams.get("playerName");
 
   const { subscribe, unsubscribe } = usePusherContext();
-  const testPusherMutation = api.test.pusher.useMutation();
 
   useEffect(() => {
     const channel = subscribe("test");
@@ -62,21 +59,6 @@ export default function GamePage() {
             </Button>
           </div>
         )}
-      </div>
-
-      <div className="mt-8 flex justify-center">
-        <PlayerList />
-      </div>
-
-      <div className="mt-8 flex justify-center">
-        <Button
-          onClick={async () => {
-            await testPusherMutation.mutateAsync({ name: "hello" });
-          }}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          Test Pusher
-        </Button>
       </div>
     </div>
   );
