@@ -7,13 +7,12 @@ export default function StartButton() {
   const param = useParams();
   const code = param.code as string;
   const router = useRouter();
-  const mutation = api.advance.advance.useMutation();
+  const mutation = api.game.startGame.useMutation();
 
   return (
     <Button
       variant={"secondary"}
       onClick={async () => {
-        
         router.push("/presenter/" + code + "/game");
         await mutation.mutateAsync({ gameCode: code });
       }}

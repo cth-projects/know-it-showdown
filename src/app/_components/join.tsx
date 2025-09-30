@@ -144,7 +144,6 @@ export default function Join() {
                 disabled={createGameMutation.isPending}
                 onClick={() => {
                   createGameMutation.mutate({
-                    playerName,
                     gameType,
                   });
                 }}

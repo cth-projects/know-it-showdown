@@ -3,17 +3,20 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { nanoid } from "nanoid";
 import { TRPCError } from "@trpc/server";
 import { pusher } from "@/lib/pusher";
+import { Game0To100State, type Prisma } from "@prisma/client";
+import type {
+  PlayerGameAdvanceEvent,
+  PresenterGameAdvanceEvent,
+} from "@/types/advance-events";
 
 export const gameRouter = createTRPCRouter({
   createGame: publicProcedure
     .input(
       z.object({
-        playerName: z.string().min(1),
         gameType: z.enum(["0-100"]),
-        totalQuestions: z.number().min(5).max(20).default(15),
       }),
     )
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ ctx }) => {
       const code = nanoid(6);
       const game = await ctx.db.game.create({
         data: {
@@ -22,36 +25,9 @@ export const gameRouter = createTRPCRouter({
         },
       });
 
-      const categories = await ctx.db.game0To100Category.findMany({
-        select: { name: true },
-      });
-
-      const questionsPerCategory = Math.ceil(
-        input.totalQuestions / categories.length,
-      );
-      const selectedQuestions: { id: number }[] = [];
-
-      // TODO: improve to get random questions not just first x questions per category
-      for (const category of categories) {
-        if (selectedQuestions.length >= input.totalQuestions) break;
-
-        const questions = await ctx.db.game0To100Question.findMany({
-          where: { categoryName: category.name },
-          take: questionsPerCategory,
-          select: { id: true },
-          orderBy: { id: "asc" },
-        });
-        selectedQuestions.push(...questions);
-      }
-
-      const finalQuestions = selectedQuestions.slice(0, input.totalQuestions);
-
       await ctx.db.game0To100.create({
         data: {
           gameCode: code,
-          questions: {
-            connect: finalQuestions,
-          },
         },
       });
 
@@ -65,7 +41,6 @@ export const gameRouter = createTRPCRouter({
         playerName: z.string().min(1, "Player name is required"),
       }),
     )
-
     .mutation(async ({ input, ctx }) => {
       const game = await ctx.db.game.findUnique({
         where: { gameCode: input.gameCode },
@@ -110,6 +85,57 @@ export const gameRouter = createTRPCRouter({
 
       return { gameId: input.gameCode, player };
     }),
+
+  startGame: publicProcedure
+    .input(
+      z.object({
+        gameCode: z.string().length(6),
+        totalQuestions: z.number().min(5).max(20).default(15),
+        secondsPerQuestion: z.number().min(15).max(120).default(60),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const categories = await ctx.db.game0To100Category.findMany({
+        select: { name: true },
+      });
+
+      const questionsPerCategory = Math.ceil(
+        input.totalQuestions / categories.length,
+      );
+      const selectedQuestions: { id: number }[] = [];
+
+      // TODO: improve to get random questions not just first x questions per category
+      for (const category of categories) {
+        if (selectedQuestions.length >= input.totalQuestions) break;
+
+        const questions = await ctx.db.game0To100Question.findMany({
+          where: { categoryName: category.name },
+          take: questionsPerCategory,
+          select: { id: true },
+          orderBy: { id: "asc" },
+        });
+        selectedQuestions.push(...questions);
+      }
+
+      const finalQuestions = selectedQuestions.slice(0, input.totalQuestions);
+
+      const updatedGame = await ctx.db.game0To100.update({
+        where: { gameCode: input.gameCode },
+        data: {
+          gameState: Game0To100State.QUESTION,
+          secondsPerQuestion: input.secondsPerQuestion,
+          questions: {
+            connect: finalQuestions,
+          },
+        },
+        include: {
+          players: true,
+          questions: true,
+        },
+      });
+      await broadcastQuestionEvents(input.gameCode, updatedGame);
+    }),
+
   getPlayers: publicProcedure
     .input(z.object({ gameCode: z.string().min(1) }))
     .query(async ({ input, ctx }) => {
@@ -119,6 +145,7 @@ export const gameRouter = createTRPCRouter({
       });
       return players;
     }),
+
   getGameState: publicProcedure
     .input(z.object({ gameCode: z.string().min(1) }))
     .query(async ({ input, ctx }) => {
@@ -144,3 +171,47 @@ export const gameRouter = createTRPCRouter({
       return { gameState: game.gameState };
     }),
 });
+
+async function broadcastQuestionEvents(
+  gameCode: string,
+  updatedGame: Prisma.Game0To100GetPayload<{
+    include: { players: true; questions: true };
+  }>,
+) {
+  const currentQuestion =
+    updatedGame.questions[updatedGame.currentQuestionIndex];
+
+  if (!currentQuestion) {
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Question not found for current index",
+    });
+  }
+
+  const baseEventData = {
+    newState: "QUESTION" as const,
+    currentQuestionIndex: updatedGame.currentQuestionIndex,
+    totalQuestions: updatedGame.questions.length,
+    timestamp: new Date().toISOString(),
+  };
+
+  const questionData = {
+    question: currentQuestion.question,
+    categoryName: currentQuestion.categoryName,
+  };
+
+  const playerEvent: PlayerGameAdvanceEvent = {
+    ...baseEventData,
+    currentQuestion: questionData,
+  };
+
+  const presenterEvent: PresenterGameAdvanceEvent = {
+    ...baseEventData,
+    currentQuestion: questionData,
+  };
+
+  await Promise.all([
+    pusher.trigger(`presenter-${gameCode}`, "game-advance", presenterEvent),
+    pusher.trigger("player-" + gameCode, "game-advance", playerEvent),
+  ]);
+}
