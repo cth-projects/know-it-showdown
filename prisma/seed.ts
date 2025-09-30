@@ -6,6 +6,13 @@ import { Game0To100State, Game0To100CategoryType } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  console.log("Removing games and questions..");
+
+  await prisma.$transaction([
+    prisma.game.deleteMany(),
+    prisma.game0To100Question.deleteMany(),
+  ]);
+
   console.log("Seeding database...");
 
   const categories = [
