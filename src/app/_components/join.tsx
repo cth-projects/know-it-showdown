@@ -114,15 +114,6 @@ export default function Join() {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <label htmlFor="playerName">Your Name</label>
-                <Input
-                  id="playerName"
-                  value={playerName}
-                  onChange={(e) => setPlayerName(e.currentTarget.value)}
-                  placeholder="Player 1"
-                />
-              </div>
-              <div className="grid gap-2">
                 <label htmlFor="gameType">Game Type</label>
                 <Select
                   onValueChange={(value) => setGameType(value as GameType)}

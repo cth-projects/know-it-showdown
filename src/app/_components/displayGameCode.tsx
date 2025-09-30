@@ -14,7 +14,7 @@ export default function Gamecode(){
         <div>
         <Button 
         variant="outline"
-        className="gap-2 text-sm h-9"
+        className="gap-2 text-sm h-9 mb-5"
         onClick={() =>
         copy(code)
         }>
