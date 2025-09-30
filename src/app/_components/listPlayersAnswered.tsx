@@ -6,6 +6,7 @@ import { usePusherContext } from "@/contexts/PusherContext";
 import { useParams } from "next/navigation";
 import { api } from "@/trpc/react";
 import type { PresenterGameAdvanceEvent } from "@/types";
+/* import { Button } from "@/components/ui/button"; */
 
 interface PlayerStatus {
   name: string;
@@ -77,11 +78,16 @@ const usePersistedPlayerStatus = (gameCode: string) => {
 
 export default function SimpleQuestionList() {
   const { subscribe, unsubscribe } = usePusherContext();
+  const [hasAdvanced, setHasAdvanced] = useState(false);
   const param = useParams();
   const code = param.code as string;
+  const advanceMutation = api.advance.advance.useMutation();
   /* const mutation = api.answers.submit.useMutation(); */
 
-  const { data } = api.game.getPlayers.useQuery({ gameCode: code });
+  const { data } = api.game.getPlayers.useQuery(
+    { gameCode: code },
+    { refetchOnMount: "always" },
+  );
   const { players, updatePlayerStatus, initializePlayers, isClient } =
     usePersistedPlayerStatus(code);
 
@@ -101,6 +107,7 @@ export default function SimpleQuestionList() {
         players.forEach((player) => {
           updatePlayerStatus(player.name, false);
         });
+        setHasAdvanced(false);
       }
     };
     const handlePlayerAnswered = (eventData: {
@@ -118,6 +125,18 @@ export default function SimpleQuestionList() {
       channel.unbind("player-answered", handlePlayerAnswered);
     };
   }, [code, players, subscribe, unsubscribe, updatePlayerStatus]);
+
+  useEffect(() => {
+    if (
+      !hasAdvanced &&
+      players.every((p) => p.answered) &&
+      players.length > 0
+    ) {
+      setHasAdvanced(true);
+      void advanceMutation.mutateAsync({ gameCode: code });
+      console.log("All players answered, advancing...");
+    }
+  }, [players, hasAdvanced, advanceMutation, code]);
   if (!isClient) {
     return (
       <div className="mx-auto max-w-4xl space-y-6 p-6">
@@ -147,17 +166,19 @@ export default function SimpleQuestionList() {
         </Badge>
 
         {/* Button to mark as answered for testing purposes */}
-        {/*         <Button
-          onClick={async () => {
-            await mutation.mutateAsync({
-              gameCode: code,
-              answer: 42,
-              playerName: player.name,
-            });
-          }}
-        >
-          Mark Answered
-        </Button> */}
+        {/* {
+          <Button
+            onClick={async () => {
+              await mutation.mutateAsync({
+                gameCode: code,
+                answer: 42,
+                playerName: player.name,
+              });
+            }}
+          >
+            Mark Answered
+          </Button>
+        } */}
       </div>
     </div>
   );
