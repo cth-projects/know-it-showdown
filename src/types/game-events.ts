@@ -1,11 +1,11 @@
-interface BaseGameAdvanceEvent {
+interface BaseGameEvent {
   newState: "LOBBY" | "QUESTION" | "RESULT" | "FINAL_RESULT";
   currentQuestionIndex: number;
   totalQuestions: number;
   timestamp: string;
 }
 
-export interface QuestionAdvanceEvent extends BaseGameAdvanceEvent {
+export interface QuestionEvent extends BaseGameEvent {
   newState: "QUESTION";
   currentQuestion: {
     question: string;
@@ -13,7 +13,7 @@ export interface QuestionAdvanceEvent extends BaseGameAdvanceEvent {
   };
 }
 
-export interface ResultAdvanceEvent extends BaseGameAdvanceEvent {
+export interface ResultEvent extends BaseGameEvent {
   newState: "RESULT";
   questionResult: {
     question: string;
@@ -28,40 +28,19 @@ export interface ResultAdvanceEvent extends BaseGameAdvanceEvent {
   }[];
 }
 
-export interface PlayerFinalResultAdvanceEvent extends BaseGameAdvanceEvent {
-  newState: "FINAL_RESULT";
-  playerResult: {
-    rank: number;
-    finalScore: number;
-    totalCorrect: number;
-  };
-  gameStats: {
-    totalPlayers: number;
-    totalQuestions: number;
-  };
-}
-
-export interface FinalResultAdvanceEvent extends BaseGameAdvanceEvent {
+export interface FinalResultEvent extends BaseGameEvent {
   newState: "FINAL_RESULT";
   finalResults: {
     rank: number;
     name: string;
     finalScore: number;
-    totalCorrect: number;
-    totalQuestions: number;
   }[];
   gameStats: {
     totalPlayers: number;
     totalQuestions: number;
-    averageScore: number;
   };
 }
 
-export type PlayerGameAdvanceEvent =
-  | QuestionAdvanceEvent
-  | PlayerFinalResultAdvanceEvent;
+export type PlayerGameEvent = QuestionEvent | FinalResultEvent;
 
-export type PresenterGameAdvanceEvent =
-  | QuestionAdvanceEvent
-  | ResultAdvanceEvent
-  | FinalResultAdvanceEvent;
+export type PresenterGameEvent = QuestionEvent | ResultEvent | FinalResultEvent;

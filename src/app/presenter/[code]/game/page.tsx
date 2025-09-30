@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import DisplayQuestion from "@/app/_components/displayQuestion";
 import { useEffect, useState } from "react";
 import { usePusherContext } from "@/contexts/PusherContext";
-import type { PresenterGameAdvanceEvent } from "@/types";
+import type { PresenterGameEvent } from "@/types";
 import ListPlayerAnswerResults from "@/app/_components/listPlayerResults";
 
 export default function GamePage() {
@@ -62,7 +62,7 @@ export default function GamePage() {
   useEffect(() => {
     const channeName = "presenter-" + code;
     const channel = subscribe(channeName);
-    const eventHandler = (event: PresenterGameAdvanceEvent) => {
+    const eventHandler = (event: PresenterGameEvent) => {
       if (event.newState == "QUESTION") {
         const endtime = Date.parse(event.timestamp) + 120 * 1000;
         setEndTimeStamp(endtime);

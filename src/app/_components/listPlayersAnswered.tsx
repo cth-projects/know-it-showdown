@@ -5,7 +5,7 @@ import { CheckCircle, Circle } from "lucide-react";
 import { usePusherContext } from "@/contexts/PusherContext";
 import { useParams } from "next/navigation";
 import { api } from "@/trpc/react";
-import type { PresenterGameAdvanceEvent } from "@/types";
+import type { PresenterGameEvent } from "@/types";
 /* import { Button } from "@/components/ui/button"; */
 
 interface PlayerStatus {
@@ -102,7 +102,7 @@ export default function SimpleQuestionList() {
     const channel = subscribe(channelName);
 
     //Reset all players to unanswered when a new question starts
-    const handlePresenterAdvanced = (event: PresenterGameAdvanceEvent) => {
+    const handlePresenterAdvanced = (event: PresenterGameEvent) => {
       if (event.newState == "QUESTION") {
         players.forEach((player) => {
           updatePlayerStatus(player.name, false);

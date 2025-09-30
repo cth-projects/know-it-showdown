@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePusherContext } from "@/contexts/PusherContext";
 import { api } from "@/trpc/react";
-import type { PresenterGameAdvanceEvent } from "@/types";
+import type { PresenterGameEvent } from "@/types";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -32,7 +32,7 @@ export default function Display() {
     const channelName = "presenter-" + code;
     const channel = subscribe(channelName);
 
-    const handlePresenterAdvanced = (event: PresenterGameAdvanceEvent) => {
+    const handlePresenterAdvanced = (event: PresenterGameEvent) => {
       if (event.newState == "QUESTION") {
         setTimeIsUp(false);
         setQuestion(event.currentQuestion.question);

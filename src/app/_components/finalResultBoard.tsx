@@ -10,11 +10,11 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { FinalResultAdvanceEvent } from "@/types/game-events";
+import type { FinalResultEvent } from "@/types/game-events";
 import { useRouter } from "next/navigation";
 
 interface finalResultBoardProps {
-  finalResultEvent: FinalResultAdvanceEvent; // The complete final result event
+  finalResultEvent: FinalResultEvent; // The complete final result event
   gameCode?: string; // Optional game code for display
   showGameInfo?: boolean; // Whether to show game metadata
 }
@@ -94,7 +94,6 @@ export default function FinalResultBoard({
                 <TableHead className="w-16 text-center">Rank</TableHead>
                 <TableHead>Player</TableHead>
                 <TableHead className="text-right">Score</TableHead>
-                <TableHead className="text-center">Correct</TableHead>
                 <TableHead className="w-20 text-center">Status</TableHead>
               </TableRow>
             </TableHeader>
@@ -127,11 +126,6 @@ export default function FinalResultBoard({
                     {player.finalScore.toLocaleString()}
                   </TableCell>
 
-                  {/* Correct Answers */}
-                  <TableCell className="text-center text-sm">
-                    {player.totalCorrect}/{player.totalQuestions}
-                  </TableCell>
-
                   {/* Status */}
                   <TableCell className="text-center">
                     {isWinner(player.rank) ? (
@@ -161,8 +155,7 @@ export default function FinalResultBoard({
             <p>
               {gameStats.totalPlayers} players • Winner:{" "}
               {winner?.name ?? "None"} • Winning Score:{" "}
-              {finalResults[0]?.finalScore ?? 0} • Average Score:{" "}
-              {gameStats.averageScore.toLocaleString()}
+              {finalResults[0]?.finalScore ?? 0}
             </p>
           </div>
         </CardContent>

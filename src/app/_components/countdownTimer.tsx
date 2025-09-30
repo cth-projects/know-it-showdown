@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { PresenterGameAdvanceEvent } from "@/types";
+import type { PresenterGameEvent } from "@/types";
 import { usePusherContext } from "@/contexts/PusherContext";
 import { useParams } from "next/navigation";
 import { api } from "@/trpc/react";
@@ -50,7 +50,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
     const channeName = "presenter-" + code;
     const channel = subscribe(channeName);
 
-    const eventHandler = (event: PresenterGameAdvanceEvent) => {
+    const eventHandler = (event: PresenterGameEvent) => {
       if (event.newState == "QUESTION") {
         setIsActive(true);
         setIsComplete(false);

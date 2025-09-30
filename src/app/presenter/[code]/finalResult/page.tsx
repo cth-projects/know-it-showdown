@@ -1,7 +1,7 @@
 import FinalResultBoard from "@/app/_components/finalResultBoard";
 import { HydrateClient } from "@/trpc/server";
 import { api } from "@/trpc/server";
-import type { FinalResultAdvanceEvent } from "@/types/game-events";
+import type { FinalResultEvent } from "@/types/game-events";
 import { notFound } from "next/navigation";
 
 export default async function FinalResult({
@@ -11,7 +11,7 @@ export default async function FinalResult({
 }) {
   const { code } = await params;
 
-  let finalResultEvent: FinalResultAdvanceEvent;
+  let finalResultEvent: FinalResultEvent;
 
   try {
     finalResultEvent = await api.finalResult.getLeaderboard({ gameCode: code });

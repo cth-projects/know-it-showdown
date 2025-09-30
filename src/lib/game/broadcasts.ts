@@ -1,7 +1,4 @@
-import type {
-  PlayerGameAdvanceEvent,
-  PresenterGameAdvanceEvent,
-} from "@/types";
+import type { PlayerGameEvent, PresenterGameEvent } from "@/types";
 import { Game0To100State, type Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { pusher } from "../pusher";
@@ -57,12 +54,12 @@ export async function broadcastQuestionEvents(
     categoryName: currentQuestion.categoryName,
   };
 
-  const playerEvent: PlayerGameAdvanceEvent = {
+  const playerEvent: PlayerGameEvent = {
     ...baseEventData,
     currentQuestion: questionData,
   };
 
-  const presenterEvent: PresenterGameAdvanceEvent = {
+  const presenterEvent: PresenterGameEvent = {
     ...baseEventData,
     currentQuestion: questionData,
   };
@@ -93,7 +90,7 @@ export async function broadcastResultEvents(
     });
   }
 
-  const presenterEvent: PresenterGameAdvanceEvent = {
+  const presenterEvent: PresenterGameEvent = {
     newState: "RESULT",
     currentQuestionIndex: updatedGame.currentQuestionIndex,
     totalQuestions: updatedGame.questions.length,
@@ -162,7 +159,7 @@ export async function broadcastFinalResultEvents(
   };
 
   // broadcast to presenter only
-  const presenterEvent: PresenterGameAdvanceEvent = {
+  const presenterEvent: PresenterGameEvent = {
     ...baseEventData,
     finalResults,
     gameStats,
