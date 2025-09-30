@@ -10,21 +10,23 @@ interface StartButtonProps {
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function StartButton({ gameSettings }: StartButtonProps) {
   const param = useParams();
   const code = param.code as string;
   const router = useRouter();
   const mutation = api.game.startGame.useMutation();
+  const { timePerQuestion, questionCount } = gameSettings;
 
   return (
     <Button
       variant={"secondary"}
       onClick={async () => {
         router.push("/presenter/" + code + "/game");
-        await mutation.mutateAsync({ gameCode: code });
-
-        // TODO: make another api call including the timePerQuestion & questionCount
+        await mutation.mutateAsync({
+          gameCode: code,
+          totalQuestions: questionCount,
+          secondsPerQuestion: timePerQuestion,
+        });
       }}
     >
       Start game
