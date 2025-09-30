@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import type { PresenterGameAdvanceEvent } from "@/types";
 import { usePusherContext } from "@/contexts/PusherContext";
 import { useParams } from "next/navigation";
+import { api } from "@/trpc/react";
 
 interface CountdownTimerProps {
   duration?: number;
@@ -11,21 +12,20 @@ interface CountdownTimerProps {
 }
 
 const CountdownTimer: React.FC<CountdownTimerProps> = ({
-  duration = 0,
+  duration = 120,
   autoStart = true,
 }) => {
-  const [timeLeft, setTimeLeft] = useState(
-    duration,
-  );
+  const [timeLeft, setTimeLeft] = useState(duration);
   const [isActive, setIsActive] = useState(autoStart);
   const [isComplete, setIsComplete] = useState(false);
+  const [hasAdvanced, setHasAdvanced] = useState(false);
   const { subscribe, unsubscribe } = usePusherContext();
   const param = useParams();
   const code = param.code as string;
+  const mutation = api.advance.advance.useMutation();
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
-
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft((prevTime) => {
@@ -59,6 +59,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
         setIsActive(false);
         setIsComplete(true);
         setTimeLeft(0);
+        setHasAdvanced(true);
       }
     };
     channel.bind("presenter-advanced", eventHandler);
@@ -67,6 +68,16 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
       channel.unbind("presenter-advanced", eventHandler);
     };
   }, [code, duration, subscribe, unsubscribe]);
+
+  useEffect(() => {
+    if (isComplete && !hasAdvanced) {
+      setHasAdvanced(true);
+      void mutation.mutateAsync({ gameCode: code });
+    } else if (!isComplete && hasAdvanced) {
+      setHasAdvanced(false);
+    }
+  }, [isComplete, hasAdvanced, mutation, code]);
+
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;

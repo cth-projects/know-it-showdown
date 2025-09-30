@@ -1,4 +1,5 @@
 "use client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePusherContext } from "@/contexts/PusherContext";
 import { api } from "@/trpc/react";
 import type { PresenterGameAdvanceEvent } from "@/types";
@@ -11,7 +12,7 @@ export default function Display() {
   const { subscribe, unsubscribe } = usePusherContext();
   const router = useRouter();
   const [timeIsUp, setTimeIsUp] = useState(false);
-  const [question, setQuestion] = useState<string>("Waiting for question...");
+  const [question, setQuestion] = useState<string>();
   const [result, setResult] = useState<number>(0);
   const { data } = api.game.getGameState.useQuery({ gameCode: code });
 
@@ -22,7 +23,7 @@ export default function Display() {
       } else if (data.gameState === "RESULT") {
         setTimeIsUp(true);
       }
-      setQuestion(data.question ?? "Waiting for question...");
+      setQuestion(data.question ?? "Loading question...");
       setResult(data.answer ?? 0);
     }
   }, [data]);
@@ -49,14 +50,28 @@ export default function Display() {
       channel.unbind("presenter-advanced", handlePresenterAdvanced);
     };
   }, [code, router, subscribe, unsubscribe]);
+  if (!data) return <div>Loading...</div>;
   return (
     <div>
-      <div className="p-10 text-7xl">{question}</div>
-      {timeIsUp ? (
-        <div className="flex flex-col items-center">
-          <div className="text-5xl">Answer: {result}</div>
-        </div>
-      ) : null}
+      <Card className="mx-auto mb-1 w-full max-w-4xl">
+        <CardHeader>
+          <CardTitle className="text-2xl">Question:</CardTitle>
+        </CardHeader>
+        <CardContent className="text-5xl">{question}</CardContent>
+
+        {timeIsUp ? (
+          <>
+            <CardHeader>
+              <CardTitle className="text-2xl text-green-600">
+                Correct answer:
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-5xl text-green-600">
+              {result}
+            </CardContent>
+          </>
+        ) : null}
+      </Card>
     </div>
   );
 }
