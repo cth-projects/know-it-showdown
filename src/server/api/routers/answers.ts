@@ -2,11 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { pusher } from "@/lib/pusher";
 import { TRPCError } from "@trpc/server";
-
-function calculateScore(playerAnswer: number, correctAnswer: number): number {
-  if (playerAnswer === correctAnswer) return -10;
-  return Math.abs(playerAnswer - correctAnswer);
-}
+import { calculateScore } from "@/lib/game";
 
 export const answersRouter = createTRPCRouter({
   submit: publicProcedure

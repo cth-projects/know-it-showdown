@@ -1,7 +1,7 @@
 import FinalResultBoard from "@/app/_components/finalResultBoard";
 import { HydrateClient } from "@/trpc/server";
 import { api } from "@/trpc/server";
-import type { FinalResultAdvanceEvent } from "@/types/advance-events";
+import type { FinalResultAdvanceEvent } from "@/types/game-events";
 import { notFound } from "next/navigation";
 
 export default async function FinalResult({

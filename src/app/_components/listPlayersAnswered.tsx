@@ -81,7 +81,7 @@ export default function SimpleQuestionList() {
   const [hasAdvanced, setHasAdvanced] = useState(false);
   const param = useParams();
   const code = param.code as string;
-  const advanceMutation = api.advance.advance.useMutation();
+  const advanceMutation = api.game.advanceGame.useMutation();
   /* const mutation = api.answers.submit.useMutation(); */
 
   const { data } = api.game.getPlayers.useQuery(

@@ -4,10 +4,12 @@ import { nanoid } from "nanoid";
 import { TRPCError } from "@trpc/server";
 import { pusher } from "@/lib/pusher";
 import { Game0To100State, type Prisma } from "@prisma/client";
-import type {
-  PlayerGameAdvanceEvent,
-  PresenterGameAdvanceEvent,
-} from "@/types/advance-events";
+import {
+  applyDefaultAnswers,
+  broadcastQuestionEvents,
+  determineNextState,
+  handleGameBroadcasting,
+} from "@/lib/game";
 
 export const gameRouter = createTRPCRouter({
   createGame: publicProcedure
@@ -170,48 +172,66 @@ export const gameRouter = createTRPCRouter({
       }
       return { gameState: game.gameState };
     }),
+
+  advanceGame: publicProcedure
+    .input(
+      z.object({
+        gameCode: z.string().length(6),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { gameCode } = input;
+
+      const game = await ctx.db.game0To100.findUnique({
+        where: { gameCode },
+        include: {
+          players: true,
+          questions: true,
+        },
+      });
+
+      if (!game) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Game not found" });
+      }
+
+      const nextState = determineNextState(
+        game.gameState,
+        game.currentQuestionIndex,
+        game.questions.length,
+      );
+
+      if (nextState === Game0To100State.RESULT) {
+        const currentQuestion = game.questions[game.currentQuestionIndex]!;
+
+        await applyDefaultAnswers(
+          ctx.db,
+          input.gameCode,
+          game.players,
+          game.currentQuestionIndex,
+          currentQuestion,
+        );
+      }
+
+      const updateData: Prisma.Game0To100UpdateInput = {
+        gameState: nextState,
+      };
+
+      if (
+        game.gameState === Game0To100State.RESULT &&
+        nextState === Game0To100State.QUESTION
+      ) {
+        updateData.currentQuestionIndex = game.currentQuestionIndex + 1;
+      }
+
+      const updatedGame = await ctx.db.game0To100.update({
+        where: { gameCode },
+        data: updateData,
+        include: {
+          players: true,
+          questions: true,
+        },
+      });
+
+      await handleGameBroadcasting(gameCode, nextState, updatedGame);
+    }),
 });
-
-async function broadcastQuestionEvents(
-  gameCode: string,
-  updatedGame: Prisma.Game0To100GetPayload<{
-    include: { players: true; questions: true };
-  }>,
-) {
-  const currentQuestion =
-    updatedGame.questions[updatedGame.currentQuestionIndex];
-
-  if (!currentQuestion) {
-    throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: "Question not found for current index",
-    });
-  }
-
-  const baseEventData = {
-    newState: "QUESTION" as const,
-    currentQuestionIndex: updatedGame.currentQuestionIndex,
-    totalQuestions: updatedGame.questions.length,
-    timestamp: new Date().toISOString(),
-  };
-
-  const questionData = {
-    question: currentQuestion.question,
-    categoryName: currentQuestion.categoryName,
-  };
-
-  const playerEvent: PlayerGameAdvanceEvent = {
-    ...baseEventData,
-    currentQuestion: questionData,
-  };
-
-  const presenterEvent: PresenterGameAdvanceEvent = {
-    ...baseEventData,
-    currentQuestion: questionData,
-  };
-
-  await Promise.all([
-    pusher.trigger(`presenter-${gameCode}`, "game-advance", presenterEvent),
-    pusher.trigger("player-" + gameCode, "game-advance", playerEvent),
-  ]);
-}

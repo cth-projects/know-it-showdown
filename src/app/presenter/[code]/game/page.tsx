@@ -13,7 +13,7 @@ import ListPlayerAnswerResults from "@/app/_components/listPlayerResults";
 export default function GamePage() {
   const param = useParams();
   const code = param.code as string;
-  const mutation = api.advance.advance.useMutation();
+  const mutation = api.game.advanceGame.useMutation();
   const { subscribe, unsubscribe } = usePusherContext();
   // Initialize from sessionStorage if available
   const [timeIsUp, setTimeIsUp] = useState(() => {

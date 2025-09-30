@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -11,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { FinalResultAdvanceEvent } from "@/types/advance-events";
+import type { FinalResultAdvanceEvent } from "@/types/game-events";
 import { useRouter } from "next/navigation";
 
 interface finalResultBoardProps {

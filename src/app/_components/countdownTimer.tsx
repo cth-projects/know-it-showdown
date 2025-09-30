@@ -22,7 +22,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
   const { subscribe, unsubscribe } = usePusherContext();
   const param = useParams();
   const code = param.code as string;
-  const mutation = api.advance.advance.useMutation();
+  const mutation = api.game.advanceGame.useMutation();
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
