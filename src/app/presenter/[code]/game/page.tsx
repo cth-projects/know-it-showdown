@@ -8,6 +8,7 @@ import DisplayQuestion from "@/app/_components/displayQuestion";
 import { useEffect, useState } from "react";
 import { usePusherContext } from "@/contexts/PusherContext";
 import type { PresenterGameAdvanceEvent } from "@/types";
+import ListPlayerAnswerResults from "@/app/_components/listPlayerResults";
 
 export default function GamePage() {
   const param = useParams();
@@ -45,7 +46,8 @@ export default function GamePage() {
 
   const [duration, setDuration] = useState(() => {
     if (typeof window !== "undefined" && endTimeStamp) {
-      return Math.floor((endTimeStamp - Date.now()) / 1000);
+      const tempDuration = Math.floor((endTimeStamp - Date.now()) / 1000);
+      return tempDuration > 0 ? tempDuration : 0;
     }
     return 120;
   });
@@ -89,12 +91,20 @@ export default function GamePage() {
     };
   }, [code, subscribe, unsubscribe]);
 
+  useEffect(() => {
+    if (timeIsUp) {
+      localStorage.clear();
+    }
+  }, [timeIsUp]);
+
   if (!isClient) return null; // Prevent SSR issues
   return (
     <main className="flex flex-col items-center gap-5 p-12">
+      {!timeIsUp ? (
+        <CountdownTimer duration={duration} autoStart={!timeIsUp} />
+      ) : null}
       <DisplayQuestion />
-      <CountdownTimer duration={duration} autoStart={!timeIsUp} />
-      <AnsweredList />
+      {!timeIsUp ? <AnsweredList /> : <ListPlayerAnswerResults />}
       <Button
         variant={"secondary"}
         onClick={async () => {
