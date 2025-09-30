@@ -7,9 +7,13 @@ import { Game0To100State, type Prisma } from "@prisma/client";
 import {
   applyDefaultAnswers,
   broadcastQuestionEvents,
+  buildFinalResultEvent,
+  buildQuestionEvent,
+  buildResultEvent,
   determineNextState,
   handleGameBroadcasting,
 } from "@/lib/game";
+import type { PresenterGameEvent } from "@/types";
 
 export const gameRouter = createTRPCRouter({
   createGame: publicProcedure
@@ -132,7 +136,9 @@ export const gameRouter = createTRPCRouter({
         },
         include: {
           players: true,
-          questions: true,
+          questions: {
+            include: { category: true },
+          },
         },
       });
       await broadcastQuestionEvents(input.gameCode, updatedGame);
@@ -186,7 +192,9 @@ export const gameRouter = createTRPCRouter({
         where: { gameCode },
         include: {
           players: true,
-          questions: true,
+          questions: {
+            include: { category: true },
+          },
         },
       });
 
@@ -228,10 +236,42 @@ export const gameRouter = createTRPCRouter({
         data: updateData,
         include: {
           players: true,
-          questions: true,
+          questions: {
+            include: { category: true },
+          },
         },
       });
 
       await handleGameBroadcasting(gameCode, nextState, updatedGame);
+    }),
+
+  getCurrentPresenterView: publicProcedure
+    .input(z.object({ gameCode: z.string().length(6) }))
+    .query(async ({ ctx, input }): Promise<PresenterGameEvent> => {
+      const game = await ctx.db.game0To100.findUnique({
+        where: { gameCode: input.gameCode },
+        include: {
+          players: true,
+          questions: {
+            include: {
+              category: true,
+            },
+          },
+        },
+      });
+
+      if (!game) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Game not found" });
+      }
+
+      if (game.gameState === Game0To100State.QUESTION) {
+        return buildQuestionEvent(game);
+      }
+
+      if (game.gameState === Game0To100State.RESULT) {
+        return buildResultEvent(game);
+      }
+
+      return buildFinalResultEvent(game);
     }),
 });

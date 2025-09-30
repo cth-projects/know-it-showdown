@@ -12,5 +12,8 @@ export * from "./answers";
 
 // questions
 
+// event-builders
+export * from "./event-builders";
+
 // constants
 export * from "./constants";

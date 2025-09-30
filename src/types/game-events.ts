@@ -9,7 +9,12 @@ export interface QuestionEvent extends BaseGameEvent {
   newState: "QUESTION";
   currentQuestion: {
     question: string;
-    categoryName: string;
+    category: {
+      title: string;
+      sdgNumber: number;
+      description: string;
+      color: string;
+    };
   };
 }
 
@@ -18,7 +23,12 @@ export interface ResultEvent extends BaseGameEvent {
   questionResult: {
     question: string;
     answer: number;
-    categoryName: string;
+    category: {
+      title: string;
+      sdgNumber: number;
+      description: string;
+      color: string;
+    };
   };
   playerResults: {
     name: string;
