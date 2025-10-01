@@ -48,7 +48,7 @@ export const gameRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const game = await ctx.db.game.findUnique({
+      const game = await ctx.db.game0To100.findUnique({
         where: { gameCode: input.gameCode },
       });
 
@@ -56,6 +56,12 @@ export const gameRouter = createTRPCRouter({
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `No game with code '${input.gameCode}'`,
+        });
+
+      if (game.gameState != Game0To100State.LOBBY)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Game has started`,
         });
 
       const nameTaken = await ctx.db.game0To100Player.findFirst({
