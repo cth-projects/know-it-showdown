@@ -1,9 +1,14 @@
 // src/lib/game/event-builders.ts
 import type { QuestionEvent, ResultEvent, FinalResultEvent } from "@/types";
-import type { Prisma } from "@prisma/client";
+import { Game0To100State, type Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { calculateScore } from "./scoring";
-import { DEFAULT_ANSWER } from "./constants";
+import {
+  BUFFER_SECONDS,
+  DEFAULT_ANSWER,
+  DISPLAY_FINAL_RESULTS_SECONDS,
+  DISPLAY_RESULTS_SECONDS,
+} from "./constants";
 
 type GameWithRelations = Prisma.Game0To100GetPayload<{
   include: {
@@ -15,10 +20,30 @@ type GameWithRelations = Prisma.Game0To100GetPayload<{
 }>;
 
 function buildBaseEventData(game: GameWithRelations) {
+  const nextAdvanceTimestamp =
+    game.gameState === Game0To100State.QUESTION
+      ? new Date(
+          Date.now() + (game.secondsPerQuestion + BUFFER_SECONDS) * 1000,
+        ).toISOString()
+      : game.gameState === Game0To100State.RESULT
+        ? new Date(
+            Date.now() + (DISPLAY_RESULTS_SECONDS + BUFFER_SECONDS) * 1000,
+          ).toISOString()
+        : game.gameState === Game0To100State.FINAL_RESULT
+          ? new Date(
+              Date.now() + DISPLAY_FINAL_RESULTS_SECONDS * 1000,
+            ).toISOString()
+          : (() => {
+              throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Invalid game state",
+              });
+            })();
+
   return {
     currentQuestionIndex: game.currentQuestionIndex,
     totalQuestions: game.questions.length,
-    timestamp: new Date().toISOString(),
+    nextAdvanceTimestamp,
   };
 }
 

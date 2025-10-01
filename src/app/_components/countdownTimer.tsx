@@ -2,34 +2,43 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 interface CountdownTimerProps {
-  duration?: number;
-  autoStart?: boolean;
+  targetTimestamp: string;
   onComplete?: () => void;
 }
 
 const CountdownTimer: React.FC<CountdownTimerProps> = ({
-  duration = 120,
-  autoStart = false,
+  targetTimestamp,
   onComplete,
 }) => {
-  const [timeLeft, setTimeLeft] = useState(duration);
-  const [isActive, setIsActive] = useState(autoStart);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [isActive, setIsActive] = useState(true);
 
   useEffect(() => {
-    if (isActive && timeLeft <= 0) {
-      setIsActive(false);
-      if (onComplete) {
-        onComplete();
-      }
-      return;
-    }
+    const calculateTimeLeft = () => {
+      const now = Date.now();
+      const target = new Date(targetTimestamp).getTime();
+      const difference = Math.max(0, Math.ceil((target - now) / 1000));
+      return difference;
+    };
+
+    setTimeLeft(calculateTimeLeft());
+    setIsActive(true);
 
     const intervalId = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
-    }, 1000);
+      const remaining = calculateTimeLeft();
+      setTimeLeft(remaining);
+
+      if (remaining <= 0) {
+        setIsActive(false);
+        clearInterval(intervalId);
+        if (onComplete) {
+          onComplete();
+        }
+      }
+    }, 100);
 
     return () => clearInterval(intervalId);
-  }, [timeLeft, onComplete, isActive]);
+  }, [targetTimestamp, onComplete]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -39,15 +48,15 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
 
   const getTimerColor = () => {
     if (!isActive) return "text-red-600";
-    if (timeLeft <= 30) return "text-red-500";
-    if (timeLeft <= 60) return "text-orange-500";
+    if (timeLeft <= 10) return "text-red-500";
+    if (timeLeft <= 30) return "text-orange-500";
     return "text-foreground";
   };
 
   const getBackgroundColor = () => {
     if (!isActive) return "bg-red-50 border-red-200";
-    if (timeLeft <= 30) return "bg-red-50 border-red-200";
-    if (timeLeft <= 60) return "bg-orange-50 border-orange-200";
+    if (timeLeft <= 10) return "bg-red-50 border-red-200";
+    if (timeLeft <= 30) return "bg-orange-50 border-orange-200";
     return "";
   };
 

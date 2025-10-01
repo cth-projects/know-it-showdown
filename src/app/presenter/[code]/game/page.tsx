@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import { usePusherContext } from "@/contexts/PusherContext";
 import type { PresenterGameEvent } from "@/types";
 import ListPlayerAnswerResults from "@/app/_components/listPlayerResults";
+import { Game0To100State } from "@prisma/client";
 
 export default function GamePage() {
   const param = useParams();
@@ -20,24 +21,24 @@ export default function GamePage() {
   const [result, setResult] = useState<number>();
   const [timeIsUp, setTimeIsUp] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [duration, setDuration] = useState(120);
+  const [nextAdvanceTimestamp, setNextAdvanceTimestamp] = useState<string>("");
+  const [isMutating, setIsMutating] = useState(false);
   const { data: fetchedEvent } = api.game.getCurrentPresenterView.useQuery({
     gameCode: code,
   });
   const eventHandler = useCallback(
     (event: PresenterGameEvent) => {
-      if (event.newState == "QUESTION") {
-        //TODO: Need to change the setting of duration based on endTimeStamp from PresenterGameEvent.
-        setDuration(20);
-
+      if (event.newState == Game0To100State.QUESTION) {
+        setNextAdvanceTimestamp(event.nextAdvanceTimestamp);
         setQuestion(event.currentQuestion.question);
-
         setTimeIsUp(false);
-      } else if (event.newState == "RESULT") {
+      } else if (event.newState == Game0To100State.RESULT) {
         setTimeIsUp(true);
         setQuestion(event.questionResult.question);
         setResult(event.questionResult.answer);
-      } else if (event.newState == "FINAL_RESULT") {
+        setNextAdvanceTimestamp(event.nextAdvanceTimestamp);
+      } else if (event.newState == Game0To100State.FINAL_RESULT) {
+        setNextAdvanceTimestamp("");
         router.push("/presenter/" + code + "/finalResult");
       }
     },
@@ -72,14 +73,19 @@ export default function GamePage() {
   }
   return (
     <main className="flex flex-col items-center gap-5 p-12">
-      {!timeIsUp ? (
-        <CountdownTimer
-          duration={duration}
-          autoStart={!timeIsUp}
-          onComplete={async () => {
-            await mutation.mutateAsync({ gameCode: code });
-          }}
-        />
+      {nextAdvanceTimestamp ? (
+        <div className={timeIsUp ? "hidden" : ""}>
+          <CountdownTimer
+            targetTimestamp={nextAdvanceTimestamp}
+            onComplete={async () => {
+              if (!isMutating) {
+                setIsMutating(true);
+                await mutation.mutateAsync({ gameCode: code });
+                setIsMutating(false);
+              }
+            }}
+          />
+        </div>
       ) : null}
       <DisplayQuestion
         question={question ?? ""}
@@ -87,14 +93,16 @@ export default function GamePage() {
         showResult={timeIsUp}
       />
       {!timeIsUp ? <AnsweredList /> : <ListPlayerAnswerResults />}
-      <Button
-        variant={"secondary"}
-        onClick={async () => {
-          await mutation.mutateAsync({ gameCode: code });
-        }}
-      >
-        {timeIsUp ? "Next Question" : "Show answer"}
-      </Button>
+      {process.env.NODE_ENV === "development" && (
+        <Button
+          variant={"secondary"}
+          onClick={async () => {
+            await mutation.mutateAsync({ gameCode: code });
+          }}
+        >
+          {timeIsUp ? "Next Question" : "Show answer"}
+        </Button>
+      )}
     </main>
   );
 }

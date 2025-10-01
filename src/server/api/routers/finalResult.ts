@@ -81,7 +81,7 @@ export const finalResultRouter = createTRPCRouter({
         newState: game.game0To100.gameState,
         currentQuestionIndex: gameData.currentQuestionIndex,
         totalQuestions,
-        timestamp: new Date().toISOString(),
+        nextAdvanceTimestamp: new Date().toISOString(),
         finalResults,
         gameStats: {
           totalPlayers,

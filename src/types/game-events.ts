@@ -2,7 +2,7 @@ interface BaseGameEvent {
   newState: "LOBBY" | "QUESTION" | "RESULT" | "FINAL_RESULT";
   currentQuestionIndex: number;
   totalQuestions: number;
-  timestamp: string;
+  nextAdvanceTimestamp: string;
 }
 
 export interface QuestionEvent extends BaseGameEvent {

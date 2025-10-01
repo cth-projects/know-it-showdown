@@ -132,7 +132,6 @@ export const gameRouter = createTRPCRouter({
       return { success: true };
     }),
 
-
   startGame: publicProcedure
     .input(
       z.object({
@@ -197,33 +196,6 @@ export const gameRouter = createTRPCRouter({
         select: { name: true },
       });
       return players;
-    }),
-
-  getGameState: publicProcedure
-    .input(z.object({ gameCode: z.string().min(1) }))
-    .query(async ({ input, ctx }) => {
-      const game = await ctx.db.game0To100.findUnique({
-        where: { gameCode: input.gameCode },
-        include: { questions: true }, // Include the questions!
-      });
-
-      if (!game)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `No game with code '${input.gameCode}'`,
-        });
-
-      if (game.gameState === "QUESTION" || game.gameState === "RESULT") {
-        const currentQuestion = game.questions[game.currentQuestionIndex];
-
-        return {
-          gameState: game.gameState,
-          question: currentQuestion?.question ?? null,
-          answer: currentQuestion?.answer ?? null,
-        };
-      }
-
-      return { gameState: game.gameState };
     }),
 
   advanceGame: publicProcedure

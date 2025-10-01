@@ -41,7 +41,7 @@ export default function FinalResultBoard({
   };
 
   const getTimeSinceEvent = () => {
-    const eventTime = new Date(finalResultEvent.timestamp);
+    const eventTime = new Date(finalResultEvent.nextAdvanceTimestamp);
     const minutesAgo = Math.floor(
       (Date.now() - eventTime.getTime()) / (1000 * 60),
     );
