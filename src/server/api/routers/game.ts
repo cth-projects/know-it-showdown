@@ -116,20 +116,24 @@ export const gameRouter = createTRPCRouter({
       );
       const selectedQuestions: { id: number }[] = [];
 
-      // TODO: improve to get random questions not just first x questions per category
       for (const category of categories) {
         if (selectedQuestions.length >= input.totalQuestions) break;
 
-        const questions = await ctx.db.game0To100Question.findMany({
+        const allQuestions = await ctx.db.game0To100Question.findMany({
           where: { categoryName: category.name },
-          take: questionsPerCategory,
           select: { id: true },
-          orderBy: { id: "asc" },
         });
-        selectedQuestions.push(...questions);
+
+        const shuffled = allQuestions
+          .sort(() => Math.random() - 0.5)
+          .slice(0, questionsPerCategory);
+
+        selectedQuestions.push(...shuffled);
       }
 
-      const finalQuestions = selectedQuestions.slice(0, input.totalQuestions);
+      const finalQuestions = selectedQuestions
+        .slice(0, input.totalQuestions)
+        .sort(() => Math.random() - 0.5);
 
       const updatedGame = await ctx.db.game0To100.update({
         where: { gameCode: input.gameCode },
