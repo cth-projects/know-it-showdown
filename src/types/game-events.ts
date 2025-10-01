@@ -54,3 +54,8 @@ export interface FinalResultEvent extends BaseGameEvent {
 export type PlayerGameEvent = QuestionEvent | FinalResultEvent;
 
 export type PresenterGameEvent = QuestionEvent | ResultEvent | FinalResultEvent;
+
+export interface PlayerStatus {
+  name: string;
+  answered: boolean;
+}

@@ -13,7 +13,7 @@ import {
   determineNextState,
   handleGameBroadcasting,
 } from "@/lib/game";
-import type { PresenterGameEvent } from "@/types";
+import type { PlayerStatus, PresenterGameEvent } from "@/types";
 
 export const gameRouter = createTRPCRouter({
   createGame: publicProcedure
@@ -273,5 +273,32 @@ export const gameRouter = createTRPCRouter({
       }
 
       return buildFinalResultEvent(game);
+    }),
+
+  getPlayersAnsweredList: publicProcedure
+    .input(z.object({ gameCode: z.string().length(6) }))
+    .query(async ({ ctx, input }): Promise<PlayerStatus[]> => {
+      const game = await ctx.db.game0To100.findUnique({
+        where: { gameCode: input.gameCode },
+        include: { players: true },
+      });
+
+      if (!game) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Game not found" });
+      }
+
+      const playerStatusList: PlayerStatus[] = [];
+
+      for (const player of game.players) {
+        const hasAnswered =
+          player.playerAnswers.length > game.currentQuestionIndex;
+
+        playerStatusList.push({
+          name: player.name,
+          answered: hasAnswered,
+        });
+      }
+
+      return playerStatusList;
     }),
 });
