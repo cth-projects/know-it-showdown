@@ -21,12 +21,13 @@ export default function StartButton({ gameSettings }: StartButtonProps) {
     <Button
       variant={"secondary"}
       onClick={async () => {
-        router.push("/presenter/" + code + "/game");
         await mutation.mutateAsync({
           gameCode: code,
           totalQuestions: questionCount,
           secondsPerQuestion: timePerQuestion,
         });
+
+        router.push("/presenter/" + code + "/game");
       }}
     >
       Start game

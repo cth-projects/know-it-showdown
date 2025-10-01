@@ -159,23 +159,25 @@ export const gameRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const game = await ctx.db.game0To100.findUnique({
         where: { gameCode: input.gameCode },
+        include: { questions: true }, // Include the questions!
       });
+
       if (!game)
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `No game with code '${input.gameCode}'`,
         });
-      if (game.gameState === "QUESTION" || "RESULT") {
-        const result = (await ctx.db.game0To100Question.findFirst({
-          where: { id: game.currentQuestionIndex + 1 },
-          select: { question: true, answer: true },
-        })) ?? { question: null, answer: null };
+
+      if (game.gameState === "QUESTION" || game.gameState === "RESULT") {
+        const currentQuestion = game.questions[game.currentQuestionIndex];
+
         return {
           gameState: game.gameState,
-          question: result.question,
-          answer: result.answer,
+          question: currentQuestion?.question ?? null,
+          answer: currentQuestion?.answer ?? null,
         };
       }
+
       return { gameState: game.gameState };
     }),
 
