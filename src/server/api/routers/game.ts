@@ -13,7 +13,7 @@ import {
   determineNextState,
   handleGameBroadcasting,
 } from "@/lib/game";
-import type { PlayerStatus, PresenterGameEvent } from "@/types";
+import type { PlayerStatus, PresenterGameEvent } from "src/types";
 
 export const gameRouter = createTRPCRouter({
   createGame: publicProcedure
@@ -97,6 +97,41 @@ export const gameRouter = createTRPCRouter({
 
       return { gameId: input.gameCode, player };
     }),
+
+  leaveGame: publicProcedure
+    .input(
+      z.object({ gameCode: z.string().min(1), playerName: z.string().min(1) }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const deletePlayer = await ctx.db.game0To100Player.deleteMany({
+        where: {
+          gameCode: input.gameCode,
+          name: input.playerName,
+        },
+      });
+
+      if (deletePlayer.count == 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Player not found in the game",
+        });
+      }
+
+      const allPlayers = await ctx.db.game0To100Player.findMany({
+        where: {
+          gameCode: input.gameCode,
+        },
+      });
+
+      await pusher.trigger(
+        `presenter-${input.gameCode}`,
+        "playerlist-updated",
+        allPlayers.map((p) => p.name),
+      );
+
+      return { success: true };
+    }),
+
 
   startGame: publicProcedure
     .input(

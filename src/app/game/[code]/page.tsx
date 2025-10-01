@@ -2,7 +2,9 @@
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { usePusherContext } from "@/contexts/PusherContext";
-import TempGameLobby from "@/app/_components/tempPlayerLobby";
+import Lobby from "@/components/game/lobby";
+
+
 
 export default function GamePage() {
   const params = useParams();
@@ -25,15 +27,10 @@ export default function GamePage() {
     };
   }, [subscribe, unsubscribe]);
 
-  const handleLeaveGame = () => {
-    window.history.back(); // moves one page back for now, doesnt change a players status in the database
-  };
-
   return (
-    <TempGameLobby
+    <Lobby
       gameCode={code}
       playerName={playerName}
-      onLeaveGame={handleLeaveGame}
     />
-  );
+  )
 }
