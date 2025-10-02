@@ -11,14 +11,10 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-interface CurrentQuestion {
-  question: string;
-  categoryName: string;
-}
+import type { QuestionEvent } from "@/types";
 
 interface QuestionCardProps {
-  question: CurrentQuestion;
+  question: QuestionEvent["currentQuestion"];
   questionIndex: number;
   totalQuestions: number;
   timeLeft: number;
@@ -100,9 +96,9 @@ export default function QuestionCard({
   };
 
   const getTimerColor = () => {
-    if (timeLeft > 10) return "text-green-400";
-    if (timeLeft > 5) return "text-yellow-400";
-    return "text-red-400";
+    if (timeLeft < 30) return "text-yellow-400";
+    else if (timeLeft < 15) return "text-red-400";
+    return "text-white-400";
   };
 
   return (
@@ -121,7 +117,7 @@ export default function QuestionCard({
         </CardTitle>
         <CardDescription>
           <span className="inline-block rounded-full bg-[hsl(280,100%,70%)]/20 px-3 py-1 text-sm text-[hsl(280,100%,70%)]">
-            {question.categoryName}
+            {question.category.title}
           </span>
           <div className="mt-2">Enter a number between 0-100</div>
         </CardDescription>
