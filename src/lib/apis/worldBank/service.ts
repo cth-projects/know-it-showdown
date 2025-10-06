@@ -1,3 +1,4 @@
+import { getSDGCategories } from "@/lib/sdg-categories";
 import {
   WorldBankClient,
   type WorldBankResponse,
@@ -254,82 +255,12 @@ export class WorldBankService {
   }
 
   private async ensureCategoriesExist(): Promise<void> {
-    const categories = [
-      {
-        name: Game0To100CategoryType.HEALTH,
-        title: "Good Health and Well-Being",
-        sdgNumber: 3,
-        description:
-          "Ensure healthy lives and promote well-being for all at all ages. This includes reducing maternal mortality, ending preventable deaths of children, combating diseases, and ensuring access to healthcare services.",
-        color: "#4C9F38",
-      },
-      {
-        name: Game0To100CategoryType.EDUCATION,
-        title: "Quality Education",
-        sdgNumber: 4,
-        description:
-          "Ensure inclusive and equitable quality education and promote lifelong learning opportunities for all. This includes achieving literacy, numeracy, and ensuring equal access to education.",
-        color: "#C5192D",
-      },
-      {
-        name: Game0To100CategoryType.WATER,
-        title: "Clean Water and Sanitation",
-        sdgNumber: 6,
-        description:
-          "Ensure availability and sustainable management of water and sanitation for all. This includes achieving access to safe drinking water, adequate sanitation, and improved water quality.",
-        color: "#26BDE2",
-      },
-      {
-        name: Game0To100CategoryType.ENERGY,
-        title: "Affordable and Clean Energy",
-        sdgNumber: 7,
-        description:
-          "Ensure access to affordable, reliable, sustainable and modern energy for all. This includes increasing the share of renewable energy and improving energy efficiency.",
-        color: "#FCC30B",
-      },
-      {
-        name: Game0To100CategoryType.EMPLOYMENT,
-        title: "Decent Work and Economic Growth",
-        sdgNumber: 8,
-        description:
-          "Promote sustained, inclusive and sustainable economic growth, full and productive employment and decent work for all. This includes reducing unemployment and promoting safe working environments.",
-        color: "#A21942",
-      },
-      {
-        name: Game0To100CategoryType.TECHNOLOGY,
-        title: "Industry, Innovation and Infrastructure",
-        sdgNumber: 9,
-        description:
-          "Build resilient infrastructure, promote inclusive and sustainable industrialization and foster innovation. This includes increasing access to information and communication technology.",
-        color: "#FD6925",
-      },
-      {
-        name: Game0To100CategoryType.URBAN_DEVELOPMENT,
-        title: "Sustainable Cities and Communities",
-        sdgNumber: 11,
-        description:
-          "Make cities and human settlements inclusive, safe, resilient and sustainable. This includes ensuring access to adequate housing, sustainable transport systems, and inclusive urbanization.",
-        color: "#FD9D24",
-      },
-      {
-        name: Game0To100CategoryType.ENVIRONMENT,
-        title: "Life on Land",
-        sdgNumber: 15,
-        description:
-          "Protect, restore and promote sustainable use of terrestrial ecosystems, sustainably manage forests, combat desertification, and halt biodiversity loss.",
-        color: "#56C02B",
-      },
-    ];
+    const categories = getSDGCategories();
 
     for (const categoryData of categories) {
       await prisma.game0To100Category.upsert({
         where: { name: categoryData.name },
-        update: {
-          title: categoryData.title,
-          sdgNumber: categoryData.sdgNumber,
-          description: categoryData.description,
-          color: categoryData.color,
-        },
+        update: categoryData,
         create: categoryData,
       });
     }

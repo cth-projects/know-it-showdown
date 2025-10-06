@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 
+import { getSDGCategories } from "@/lib/sdg-categories";
 import { PrismaClient } from "@prisma/client";
 import { Game0To100State, Game0To100CategoryType } from "@prisma/client";
 
@@ -15,87 +16,46 @@ async function main() {
 
   console.log("Seeding database...");
 
-  const categories = [
-    {
-      name: Game0To100CategoryType.HEALTH,
-      title: "Good Health and Well-Being",
-      sdgNumber: 3,
-      description:
-        "Ensure healthy lives and promote well-being for all at all ages. This includes reducing maternal mortality, ending preventable deaths of children, combating diseases, and ensuring access to healthcare services.",
-      color: "#4C9F38",
-    },
-    {
-      name: Game0To100CategoryType.EDUCATION,
-      title: "Quality Education",
-      sdgNumber: 4,
-      description:
-        "Ensure inclusive and equitable quality education and promote lifelong learning opportunities for all. This includes achieving literacy, numeracy, and ensuring equal access to education.",
-      color: "#C5192D",
-    },
-    {
-      name: Game0To100CategoryType.WATER,
-      title: "Clean Water and Sanitation",
-      sdgNumber: 6,
-      description:
-        "Ensure availability and sustainable management of water and sanitation for all. This includes achieving access to safe drinking water, adequate sanitation, and improved water quality.",
-      color: "#26BDE2",
-    },
-    {
-      name: Game0To100CategoryType.ENERGY,
-      title: "Affordable and Clean Energy",
-      sdgNumber: 7,
-      description:
-        "Ensure access to affordable, reliable, sustainable and modern energy for all. This includes increasing the share of renewable energy and improving energy efficiency.",
-      color: "#FCC30B",
-    },
-    {
-      name: Game0To100CategoryType.EMPLOYMENT,
-      title: "Decent Work and Economic Growth",
-      sdgNumber: 8,
-      description:
-        "Promote sustained, inclusive and sustainable economic growth, full and productive employment and decent work for all. This includes reducing unemployment and promoting safe working environments.",
-      color: "#A21942",
-    },
-    {
-      name: Game0To100CategoryType.TECHNOLOGY,
-      title: "Industry, Innovation and Infrastructure",
-      sdgNumber: 9,
-      description:
-        "Build resilient infrastructure, promote inclusive and sustainable industrialization and foster innovation. This includes increasing access to information and communication technology.",
-      color: "#FD6925",
-    },
-    {
-      name: Game0To100CategoryType.URBAN_DEVELOPMENT,
-      title: "Sustainable Cities and Communities",
-      sdgNumber: 11,
-      description:
-        "Make cities and human settlements inclusive, safe, resilient and sustainable. This includes ensuring access to adequate housing, sustainable transport systems, and inclusive urbanization.",
-      color: "#FD9D24",
-    },
-    {
-      name: Game0To100CategoryType.ENVIRONMENT,
-      title: "Life on Land",
-      sdgNumber: 15,
-      description:
-        "Protect, restore and promote sustainable use of terrestrial ecosystems, sustainably manage forests, combat desertification, and halt biodiversity loss.",
-      color: "#56C02B",
-    },
-  ];
+  const categories = getSDGCategories();
 
   for (const categoryData of categories) {
     await prisma.game0To100Category.upsert({
       where: { name: categoryData.name },
-      update: {
-        title: categoryData.title,
-        sdgNumber: categoryData.sdgNumber,
-        description: categoryData.description,
-        color: categoryData.color,
-      },
+      update: categoryData,
       create: categoryData,
     });
   }
 
   const sampleQuestions = [
+    // SDG 1: POVERTY
+    {
+      question:
+        "What percentage of the world's population lives in extreme poverty (less than $2.15/day)?",
+      answer: 9,
+      categoryName: Game0To100CategoryType.POVERTY,
+    },
+    {
+      question:
+        "What percentage of people in sub-Saharan Africa live below the poverty line?",
+      answer: 40,
+      categoryName: Game0To100CategoryType.POVERTY,
+    },
+
+    // SDG 2: HUNGER
+    {
+      question:
+        "What percentage of the global population suffers from moderate or severe food insecurity?",
+      answer: 30,
+      categoryName: Game0To100CategoryType.HUNGER,
+    },
+    {
+      question:
+        "What percentage of children under 5 are affected by stunting due to malnutrition?",
+      answer: 22,
+      categoryName: Game0To100CategoryType.HUNGER,
+    },
+
+    // SDG 3: HEALTH
     {
       question: "What percentage of the human body is approximately water?",
       answer: 60,
@@ -107,20 +67,11 @@ async function main() {
       answer: 98,
       categoryName: Game0To100CategoryType.HEALTH,
     },
-    {
-      question: "What percentage of adults globally are overweight or obese?",
-      answer: 39,
-      categoryName: Game0To100CategoryType.HEALTH,
-    },
+
+    // SDG 4: EDUCATION
     {
       question: "What percentage of the world's population can read and write?",
       answer: 86,
-      categoryName: Game0To100CategoryType.EDUCATION,
-    },
-    {
-      question:
-        "How many years of primary education do most countries provide?",
-      answer: 6,
       categoryName: Game0To100CategoryType.EDUCATION,
     },
     {
@@ -128,6 +79,22 @@ async function main() {
       answer: 91,
       categoryName: Game0To100CategoryType.EDUCATION,
     },
+
+    // SDG 5: GENDER
+    {
+      question:
+        "What percentage of national parliamentarians globally are women?",
+      answer: 26,
+      categoryName: Game0To100CategoryType.GENDER,
+    },
+    {
+      question:
+        "What percentage of women worldwide have experienced physical or sexual violence?",
+      answer: 30,
+      categoryName: Game0To100CategoryType.GENDER,
+    },
+
+    // SDG 6: WATER
     {
       question: "What percentage of Earth's surface is covered by water?",
       answer: 71,
@@ -139,11 +106,8 @@ async function main() {
       answer: 90,
       categoryName: Game0To100CategoryType.WATER,
     },
-    {
-      question: "What percentage of Earth's water is freshwater?",
-      answer: 3,
-      categoryName: Game0To100CategoryType.WATER,
-    },
+
+    // SDG 7: ENERGY
     {
       question:
         "What percentage of global energy comes from renewable sources?",
@@ -151,16 +115,13 @@ async function main() {
       categoryName: Game0To100CategoryType.ENERGY,
     },
     {
-      question: "At what temperature does water boil in Celsius?",
-      answer: 100,
-      categoryName: Game0To100CategoryType.ENERGY,
-    },
-    {
       question:
-        "What percentage of global electricity comes from fossil fuels?",
-      answer: 62,
+        "What percentage of the global population has access to electricity?",
+      answer: 91,
       categoryName: Game0To100CategoryType.ENERGY,
     },
+
+    // SDG 8: EMPLOYMENT
     {
       question: "What percentage of the global workforce is unemployed?",
       answer: 6,
@@ -171,11 +132,8 @@ async function main() {
       answer: 27,
       categoryName: Game0To100CategoryType.EMPLOYMENT,
     },
-    {
-      question: "What is the average retirement age globally? (Rounded)",
-      answer: 64,
-      categoryName: Game0To100CategoryType.EMPLOYMENT,
-    },
+
+    // SDG 9: TECHNOLOGY
     {
       question:
         "What percentage of the world's population has internet access?",
@@ -187,12 +145,22 @@ async function main() {
       answer: 68,
       categoryName: Game0To100CategoryType.TECHNOLOGY,
     },
+
+    // SDG 10: INEQUALITY
     {
       question:
-        "How many hours per day does the average person spend on their phone?",
-      answer: 7,
-      categoryName: Game0To100CategoryType.TECHNOLOGY,
+        "What percentage of global wealth is owned by the richest 1% of the population?",
+      answer: 45,
+      categoryName: Game0To100CategoryType.INEQUALITY,
     },
+    {
+      question:
+        "What percentage of global income goes to the poorest 50% of the population?",
+      answer: 8,
+      categoryName: Game0To100CategoryType.INEQUALITY,
+    },
+
+    // SDG 11: URBAN_DEVELOPMENT
     {
       question:
         "What percentage of the world's population lives in urban areas?",
@@ -204,27 +172,82 @@ async function main() {
       answer: 80,
       categoryName: Game0To100CategoryType.URBAN_DEVELOPMENT,
     },
+
+    // SDG 12: CONSUMPTION
+    {
+      question: "What percentage of global food production is wasted or lost?",
+      answer: 30,
+      categoryName: Game0To100CategoryType.CONSUMPTION,
+    },
+    {
+      question: "What percentage of plastic waste is recycled globally?",
+      answer: 9,
+      categoryName: Game0To100CategoryType.CONSUMPTION,
+    },
+
+    // SDG 13: CLIMATE
     {
       question:
-        "How many megacities (over 10 million people) are there globally?",
-      answer: 33,
-      categoryName: Game0To100CategoryType.URBAN_DEVELOPMENT,
+        "By what percentage have global CO2 emissions increased since 1990?",
+      answer: 60,
+      categoryName: Game0To100CategoryType.CLIMATE,
     },
+    {
+      question:
+        "What percentage of countries have submitted climate action plans?",
+      answer: 95,
+      categoryName: Game0To100CategoryType.CLIMATE,
+    },
+
+    // SDG 14: OCEANS
+    {
+      question: "What percentage of global fish stocks are overfished?",
+      answer: 35,
+      categoryName: Game0To100CategoryType.OCEANS,
+    },
+    {
+      question: "What percentage of marine areas are protected globally?",
+      answer: 8,
+      categoryName: Game0To100CategoryType.OCEANS,
+    },
+
+    // SDG 15: ENVIRONMENT
     {
       question: "What percentage of Earth's atmosphere is nitrogen? (Rounded)",
       answer: 78,
       categoryName: Game0To100CategoryType.ENVIRONMENT,
     },
     {
-      question:
-        "What percentage of global greenhouse gas emissions come from agriculture?",
-      answer: 24,
-      categoryName: Game0To100CategoryType.ENVIRONMENT,
-    },
-    {
       question: "What percentage of the Amazon rainforest has been deforested?",
       answer: 17,
       categoryName: Game0To100CategoryType.ENVIRONMENT,
+    },
+
+    // SDG 16: PEACE
+    {
+      question:
+        "What percentage of the world's population lives in countries affected by conflict?",
+      answer: 25,
+      categoryName: Game0To100CategoryType.PEACE,
+    },
+    {
+      question: "What percentage of global births are registered?",
+      answer: 75,
+      categoryName: Game0To100CategoryType.PEACE,
+    },
+
+    // SDG 17: PARTNERSHIPS
+    {
+      question:
+        "What percentage of official development assistance goes to least developed countries?",
+      answer: 30,
+      categoryName: Game0To100CategoryType.PARTNERSHIPS,
+    },
+    {
+      question:
+        "What percentage of developing countries have national statistical plans?",
+      answer: 55,
+      categoryName: Game0To100CategoryType.PARTNERSHIPS,
     },
   ];
 
