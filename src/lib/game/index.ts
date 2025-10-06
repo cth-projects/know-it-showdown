@@ -11,6 +11,7 @@ export * from "./state";
 export * from "./answers";
 
 // questions
+export * from "./questions";
 
 // event-builders
 export * from "./event-builders";

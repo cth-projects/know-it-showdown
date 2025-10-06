@@ -11,6 +11,7 @@ import {
   buildQuestionEvent,
   buildResultEvent,
   determineNextState,
+  getRandomQuestions,
   handleGameBroadcasting,
 } from "@/lib/game";
 import type { PlayerStatus, PresenterGameEvent } from "src/types";
@@ -138,38 +139,15 @@ export const gameRouter = createTRPCRouter({
     .input(
       z.object({
         gameCode: z.string().length(6),
-        totalQuestions: z.number().min(5).max(20).default(15),
+        totalQuestions: z.number().min(5).max(25).default(15),
         secondsPerQuestion: z.number().min(15).max(120).default(60),
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const categories = await ctx.db.game0To100Category.findMany({
-        select: { name: true },
-      });
-
-      const questionsPerCategory = Math.ceil(
-        input.totalQuestions / categories.length,
+      const finalQuestions = await getRandomQuestions(
+        ctx.db,
+        input.totalQuestions,
       );
-      const selectedQuestions: { id: number }[] = [];
-
-      for (const category of categories) {
-        if (selectedQuestions.length >= input.totalQuestions) break;
-
-        const allQuestions = await ctx.db.game0To100Question.findMany({
-          where: { categoryName: category.name },
-          select: { id: true },
-        });
-
-        const shuffled = allQuestions
-          .sort(() => Math.random() - 0.5)
-          .slice(0, questionsPerCategory);
-
-        selectedQuestions.push(...shuffled);
-      }
-
-      const finalQuestions = selectedQuestions
-        .slice(0, input.totalQuestions)
-        .sort(() => Math.random() - 0.5);
 
       const updatedGame = await ctx.db.game0To100.update({
         where: { gameCode: input.gameCode },
@@ -187,6 +165,7 @@ export const gameRouter = createTRPCRouter({
           },
         },
       });
+
       await broadcastQuestionEvents(input.gameCode, updatedGame);
     }),
 
