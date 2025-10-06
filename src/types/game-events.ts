@@ -18,6 +18,13 @@ export interface QuestionEvent extends BaseGameEvent {
   };
 }
 
+export interface PlayerResult {
+  name: string;
+  answer: number;
+  scoreForQuestion: number;
+  currentScore: number;
+}
+
 export interface ResultEvent extends BaseGameEvent {
   newState: "RESULT";
   questionResult: {
@@ -30,12 +37,7 @@ export interface ResultEvent extends BaseGameEvent {
       color: string;
     };
   };
-  playerResults: {
-    name: string;
-    answer: number;
-    scoreForQuestion: number;
-    currentScore: number;
-  }[];
+  playerResults: PlayerResult[];
 }
 
 export interface FinalResultEvent extends BaseGameEvent {

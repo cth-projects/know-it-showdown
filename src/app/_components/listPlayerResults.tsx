@@ -1,26 +1,16 @@
-import { useState, useEffect } from "react";
-import { api } from "@/trpc/react";
-import { useParams } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Award, Medal, Trophy } from "lucide-react";
 import PlayerAvatarWithScore from "./playerAvatarWithScore";
+import type { PlayerResult } from "@/types";
 
-export default function ListPlayerAnswerResults() {
-  const param = useParams();
-  const code = param.code as string;
-  const { data } = api.answers.getAnswersFromCurrentQuestion.useQuery(
-    {
-      gameCode: code,
-    },
-    { refetchOnMount: "always" },
-  );
-  const [answers, setAnswers] = useState(data?.answers ?? null);
+const MAX_PLAYERS_PER_ROW = 7;
 
-  useEffect(() => {
-    setAnswers(data?.answers ?? null);
-    setAnswers((a) => a?.sort((b, a) => b.score - a.score) ?? null);
-  }, [answers, data]);
+type ListPlayerAnswerResultsProps = {
+  playerResults: PlayerResult[];
+};
 
+export default function ListPlayerAnswerResults({
+  playerResults,
+}: ListPlayerAnswerResultsProps) {
   const getMedalIcon = (index: number) => {
     switch (index) {
       case 0:
@@ -34,59 +24,82 @@ export default function ListPlayerAnswerResults() {
     }
   };
 
-  if (!answers) {
+  const getBalancedRows = (players: PlayerResult[]): PlayerResult[][] => {
+    if (players.length === 0) return [];
+
+    const totalPlayers = players.length;
+
+    if (totalPlayers <= MAX_PLAYERS_PER_ROW) {
+      return [players];
+    }
+
+    const numRows = Math.ceil(totalPlayers / MAX_PLAYERS_PER_ROW);
+    const playersPerRow = Math.ceil(totalPlayers / numRows);
+
+    const rows: PlayerResult[][] = [];
+    for (let i = 0; i < totalPlayers; i += playersPerRow) {
+      rows.push(players.slice(i, i + playersPerRow));
+    }
+
+    return rows;
+  };
+
+  const sortedResults = [...playerResults].sort(
+    (a, b) => b.scoreForQuestion - a.scoreForQuestion,
+  );
+
+  if (sortedResults.length === 0) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="space-y-4 text-center">
-          <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
           <p className="text-xl font-semibold text-gray-600">
-            Loading results...
+            No results available
           </p>
         </div>
       </div>
     );
   }
 
+  const rows = getBalancedRows(sortedResults);
+
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6 p-6">
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5" />
-            Results
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
-            {answers.map((answer, index) => (
+    <div className="mx-auto w-full max-w-7xl space-y-8 p-6">
+      {rows.map((row, rowIndex) => (
+        <div key={rowIndex} className="flex flex-wrap justify-center gap-6">
+          {row.map((result, indexInRow) => {
+            const globalIndex =
+              rows.slice(0, rowIndex).reduce((sum, r) => sum + r.length, 0) +
+              indexInRow;
+
+            return (
               <div
-                key={`${answer.name}-${index}`}
+                key={`${result.name}-${globalIndex}`}
                 className="flex flex-col items-center gap-3"
               >
                 <div className="relative">
                   <PlayerAvatarWithScore
-                    name={answer.name}
-                    score={answer.score}
+                    name={result.name}
+                    score={result.scoreForQuestion}
                     startFrom={100}
                     size="md"
                     duration={1000}
                   />
-                  {index < 3 && (
+                  {globalIndex < 3 && (
                     <div className="absolute -top-2 -right-2">
-                      {getMedalIcon(index)}
+                      {getMedalIcon(globalIndex)}
                     </div>
                   )}
                 </div>
-                {index >= 3 && (
+                {globalIndex >= 3 && (
                   <span className="text-sm font-medium text-gray-500">
-                    #{index + 1}
+                    #{globalIndex + 1}
                   </span>
                 )}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }

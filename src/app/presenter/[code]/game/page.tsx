@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import DisplayQuestion from "@/app/_components/displayQuestion";
 import { useCallback, useEffect, useState } from "react";
 import { usePusherContext } from "@/contexts/PusherContext";
-import type { PresenterGameEvent } from "@/types";
+import type { PlayerResult, PresenterGameEvent } from "@/types";
 import ListPlayerAnswerResults from "@/app/_components/listPlayerResults";
 import { Game0To100State } from "@prisma/client";
 
@@ -23,27 +23,33 @@ export default function GamePage() {
   const [isClient, setIsClient] = useState(false);
   const [nextAdvanceTimestamp, setNextAdvanceTimestamp] = useState<string>("");
   const [isMutating, setIsMutating] = useState(false);
+  const [playerResults, setPlayerResults] = useState<PlayerResult[]>([]);
+
   const { data: fetchedEvent } = api.game.getCurrentPresenterView.useQuery({
     gameCode: code,
   });
+
   const eventHandler = useCallback(
     (event: PresenterGameEvent) => {
-      if (event.newState == Game0To100State.QUESTION) {
+      if (event.newState === Game0To100State.QUESTION) {
         setNextAdvanceTimestamp(event.nextAdvanceTimestamp);
         setQuestion(event.currentQuestion.question);
         setTimeIsUp(false);
-      } else if (event.newState == Game0To100State.RESULT) {
+        setPlayerResults([]); // Clear previous results
+      } else if (event.newState === Game0To100State.RESULT) {
         setTimeIsUp(true);
         setQuestion(event.questionResult.question);
         setResult(event.questionResult.answer);
         setNextAdvanceTimestamp(event.nextAdvanceTimestamp);
-      } else if (event.newState == Game0To100State.FINAL_RESULT) {
+        setPlayerResults(event.playerResults);
+      } else if (event.newState === Game0To100State.FINAL_RESULT) {
         setNextAdvanceTimestamp("");
         router.push("/presenter/" + code + "/finalResult");
       }
     },
     [router, code],
   );
+
   useEffect(() => {
     if (fetchedEvent) {
       eventHandler(fetchedEvent);
@@ -71,6 +77,7 @@ export default function GamePage() {
       </div>
     );
   }
+
   return (
     <main className="flex flex-col items-center gap-5 p-12">
       {nextAdvanceTimestamp ? (
@@ -92,7 +99,11 @@ export default function GamePage() {
         result={result ?? 0}
         showResult={timeIsUp}
       />
-      {!timeIsUp ? <AnsweredList /> : <ListPlayerAnswerResults />}
+      {!timeIsUp ? (
+        <AnsweredList />
+      ) : (
+        <ListPlayerAnswerResults playerResults={playerResults} />
+      )}
       {process.env.NODE_ENV === "development" && (
         <Button
           variant={"secondary"}

@@ -93,43 +93,4 @@ export const answersRouter = createTRPCRouter({
         });
       }
     }),
-
-  getAnswersFromCurrentQuestion: publicProcedure
-    .input(z.object({ gameCode: z.string().length(6) }))
-    .query(async ({ ctx, input }) => {
-      const { gameCode } = input;
-
-      const game = await ctx.db.game0To100.findUnique({
-        where: { gameCode },
-        include: {
-          questions: true,
-          players: true,
-        },
-      });
-
-      if (!game) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Game not found" });
-      }
-
-      const currentQuestionIndex = game.currentQuestionIndex;
-      const currentQuestion = game.questions[currentQuestionIndex];
-
-      if (!currentQuestion) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Current question not found",
-        });
-      }
-
-      const answers = game.players.map((player) => {
-        const playerAnswer = player.playerAnswers[currentQuestionIndex];
-        return {
-          name: player.name,
-          answer: playerAnswer,
-          score: calculateScore(playerAnswer ?? 0, currentQuestion.answer),
-          index: currentQuestionIndex,
-        };
-      });
-      return { answers };
-    }),
 });
