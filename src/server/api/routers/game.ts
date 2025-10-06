@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { nanoid } from "nanoid";
+import { customAlphabet } from "nanoid";
 import { TRPCError } from "@trpc/server";
 import { pusher } from "@/lib/pusher";
 import { Game0To100State, type Prisma } from "@prisma/client";
@@ -23,11 +23,13 @@ export const gameRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx }) => {
-      const code = nanoid(6);
+      const nanoid = customAlphabet("BCDFGHJKLMNPQRSTVWXYZ", 6);
+
+      const code = nanoid();
       const game = await ctx.db.game.create({
         data: {
           gameCode: code,
-          upstashId: nanoid(), // TODO: use actual id...
+          upstashId: nanoid(), // TODO: we're not using upstash so remove from DB?
         },
       });
 
