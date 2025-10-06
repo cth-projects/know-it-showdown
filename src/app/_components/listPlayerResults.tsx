@@ -3,6 +3,7 @@ import { api } from "@/trpc/react";
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Award, Medal, Trophy } from "lucide-react";
+import PlayerAvatarWithScore from "./playerAvatarWithScore";
 
 export default function ListPlayerAnswerResults() {
   const param = useParams();
@@ -19,14 +20,15 @@ export default function ListPlayerAnswerResults() {
     setAnswers(data?.answers ?? null);
     setAnswers((a) => a?.sort((b, a) => b.score - a.score) ?? null);
   }, [answers, data]);
+
   const getMedalIcon = (index: number) => {
     switch (index) {
       case 0:
-        return <Trophy className="h-6 w-6 text-yellow-500" />;
+        return <Trophy className="h-8 w-8 text-yellow-500" />;
       case 1:
-        return <Medal className="h-6 w-6 text-gray-400" />;
+        return <Medal className="h-8 w-8 text-gray-400" />;
       case 2:
-        return <Award className="h-6 w-6 text-amber-600" />;
+        return <Award className="h-8 w-8 text-amber-600" />;
       default:
         return null;
     }
@@ -46,9 +48,7 @@ export default function ListPlayerAnswerResults() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-6 p-3">
-      {/* Results */}
-
+    <div className="mx-auto w-full max-w-6xl space-y-6 p-6">
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -56,36 +56,35 @@ export default function ListPlayerAnswerResults() {
             Results
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {answers.map((answer, index) => (
-            <div
-              key={`${answer.name}-${index}`}
-              className={`flex items-center justify-between rounded-lg p-4 transition-all duration-200 ${index < 3 ? "border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50" : "bg-gray-50 hover:bg-gray-100"} `}
-            >
-              {/* Rank and Name */}
-              <div className="flex flex-1 items-center gap-4">
-                <div className="flex w-10 items-center justify-center">
-                  {index < 3 ? (
-                    getMedalIcon(index)
-                  ) : (
-                    <span className="text-lg font-bold text-gray-400">
-                      #{index + 1}
-                    </span>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+            {answers.map((answer, index) => (
+              <div
+                key={`${answer.name}-${index}`}
+                className="flex flex-col items-center gap-3"
+              >
+                <div className="relative">
+                  <PlayerAvatarWithScore
+                    name={answer.name}
+                    score={answer.score}
+                    startFrom={100}
+                    size="md"
+                    duration={1000}
+                  />
+                  {index < 3 && (
+                    <div className="absolute -top-2 -right-2">
+                      {getMedalIcon(index)}
+                    </div>
                   )}
                 </div>
-                <div className="space-y-1">
-                  <p className="text-lg font-semibold text-gray-800">
-                    {answer.name}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Answer: <span className="font-medium">{answer.answer}</span>
-                  </p>
-                </div>
+                {index >= 3 && (
+                  <span className="text-sm font-medium text-gray-500">
+                    #{index + 1}
+                  </span>
+                )}
               </div>
-              {/* Score */}
-              <CardContent>{answer.score} points</CardContent>
-            </div>
-          ))}
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>

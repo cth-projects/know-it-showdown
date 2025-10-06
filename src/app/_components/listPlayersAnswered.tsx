@@ -82,7 +82,7 @@ export default function SimpleQuestionList() {
       }}
       className="p-4"
     >
-      <PlayerAvatar name={player.name} />
+      <PlayerAvatar name={player.name} size={"sm"} />
     </motion.div>
   );
 
