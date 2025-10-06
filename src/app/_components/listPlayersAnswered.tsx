@@ -6,8 +6,8 @@ import { usePusherContext } from "@/contexts/PusherContext";
 import { useParams } from "next/navigation";
 import { api } from "@/trpc/react";
 import type { PlayerStatus } from "@/types";
-import { Button } from "@/components/ui/button";
 import { motion, LayoutGroup } from "motion/react";
+import PlayerAvatar from "./playerAvatar";
 
 export default function SimpleQuestionList() {
   const { subscribe, unsubscribe } = usePusherContext();
@@ -17,7 +17,6 @@ export default function SimpleQuestionList() {
   const advanceMutation = api.game.advanceGame.useMutation();
   const [players, setPlayers] = useState<PlayerStatus[]>([]);
   const [isClient, setIsClient] = useState(false);
-  const mutation = api.answers.submit.useMutation();
 
   const { data } = api.game.getPlayersAnsweredList.useQuery({ gameCode: code });
 
@@ -79,46 +78,17 @@ export default function SimpleQuestionList() {
       transition={{
         type: "spring",
         stiffness: 350,
-        damping: 30
+        damping: 30,
       }}
-      className="mb-2 flex items-center justify-between gap-3 rounded-lg border bg-white p-3 transition-shadow hover:shadow-sm"
+      className="p-4"
     >
-      <div className="flex items-center gap-3">
-        {player.answered ? (
-          <CheckCircle className="h-5 w-5 text-green-500" />
-        ) : (
-          <Circle className="h-5 w-5 text-gray-400" />
-        )}
-        <span className={player.answered ? "text-gray-600" : "text-gray-900"}>
-          {player.name}
-        </span>
-      </div>
-      <div className="flex items-center gap-2">
-        <Badge variant={player.answered ? "default" : "secondary"}>
-          {player.answered ? "Answered" : "Pending"}
-        </Badge>
-
-        {/* Button to mark as answered for testing purposes */}
-        {
-          <Button
-            onClick={async () => {
-              await mutation.mutateAsync({
-                gameCode: code,
-                answer: 42,
-                playerName: player.name,
-              });
-            }}
-          >
-            Mark Answered
-          </Button>
-        }
-      </div>
+      <PlayerAvatar name={player.name} />
     </motion.div>
   );
 
   return (
     <LayoutGroup>
-      <div className="mx-auto max-w-4xl space-y-6 p-6">
+      <div className="mx-auto max-w-6xl space-y-6 p-6">
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
@@ -134,13 +104,15 @@ export default function SimpleQuestionList() {
                   All players have answered! 🎉
                 </p>
               ) : (
-                unansweredQuestions.map((player) => (
-                  <QuestionItem
-                    key={player.name}
-                    name={player.name}
-                    answered={player.answered}
-                  />
-                ))
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                  {unansweredQuestions.map((player) => (
+                    <QuestionItem
+                      key={player.name}
+                      name={player.name}
+                      answered={player.answered}
+                    />
+                  ))}
+                </div>
               )}
             </CardContent>
           </Card>
@@ -157,13 +129,15 @@ export default function SimpleQuestionList() {
               {answeredQuestions.length === 0 ? (
                 <p className="py-8 text-center text-gray-500">No answers yet</p>
               ) : (
-                answeredQuestions.map((player) => (
-                  <QuestionItem
-                    key={player.name}
-                    name={player.name}
-                    answered={player.answered}
-                  />
-                ))
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                  {answeredQuestions.map((player) => (
+                    <QuestionItem
+                      key={player.name}
+                      name={player.name}
+                      answered={player.answered}
+                    />
+                  ))}
+                </div>
               )}
             </CardContent>
           </Card>

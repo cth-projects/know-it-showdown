@@ -1,5 +1,6 @@
 import { Game0To100CategoryType } from "@prisma/client";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const sampleQuestions = [
   {
     question: "What percentage of the human body is approximately water?",
