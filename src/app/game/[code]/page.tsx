@@ -44,7 +44,7 @@ export default function GamePage() {
     };
   }, [code, subscribe, timeLeft, unsubscribe]);
 
-  const submitAnswerMutation = api.answers.submit.useMutation();
+  const submitAnswerMutation = api.game.submitAnswer.useMutation();
 
   const handleSubmitAnswer = async (answer: number) => {
     if (!playerName) {

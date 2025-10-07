@@ -13,19 +13,25 @@ export async function applyDefaultAnswers(
   currentQuestionIndex: number,
   currentQuestion: Game0To100Question,
 ) {
+  const scoreForQuestion = calculateScore(
+    DEFAULT_ANSWER,
+    currentQuestion.answer,
+  );
+
   for (const player of players) {
-    if (player.playerAnswers.length <= currentQuestionIndex) {
-      const scoreForQuestion = calculateScore(
-        DEFAULT_ANSWER,
-        currentQuestion.answer,
-      );
+    const updatedAnswers = [...player.playerAnswers];
+
+    if (updatedAnswers[currentQuestionIndex] === undefined) {
+      while (updatedAnswers.length <= currentQuestionIndex) {
+        updatedAnswers.push(DEFAULT_ANSWER);
+      }
 
       await db.game0To100Player.update({
         where: {
           name_gameCode: { name: player.name, gameCode },
         },
         data: {
-          playerAnswers: { push: DEFAULT_ANSWER },
+          playerAnswers: { set: updatedAnswers },
           score: { increment: scoreForQuestion },
         },
       });

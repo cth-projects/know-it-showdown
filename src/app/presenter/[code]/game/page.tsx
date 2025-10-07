@@ -15,7 +15,8 @@ export default function GamePage() {
   const param = useParams();
   const code = param.code as string;
   const router = useRouter();
-  const mutation = api.game.advanceGame.useMutation();
+  const startRoundMutation = api.game.startRound.useMutation();
+  const endRoundMutation = api.game.endRound.useMutation();
   const { subscribe, unsubscribe } = usePusherContext();
   const [question, setQuestion] = useState<string>();
   const [result, setResult] = useState<number>();
@@ -24,6 +25,7 @@ export default function GamePage() {
   const [nextAdvanceTimestamp, setNextAdvanceTimestamp] = useState<string>("");
   const [isMutating, setIsMutating] = useState(false);
   const [playerResults, setPlayerResults] = useState<PlayerResult[]>([]);
+  const [gameState, setGameState] = useState<Game0To100State>();
 
   const { data: fetchedEvent } = api.game.getCurrentPresenterView.useQuery({
     gameCode: code,
@@ -31,6 +33,8 @@ export default function GamePage() {
 
   const eventHandler = useCallback(
     (event: PresenterGameEvent) => {
+      setGameState(event.newState);
+
       if (event.newState === Game0To100State.QUESTION) {
         setNextAdvanceTimestamp(event.nextAdvanceTimestamp);
         setQuestion(event.currentQuestion.question);
@@ -67,6 +71,24 @@ export default function GamePage() {
     };
   }, [code, eventHandler, subscribe, unsubscribe]);
 
+  const handleAdvance = async () => {
+    if (isMutating) return;
+
+    setIsMutating(true);
+    try {
+      if (gameState === Game0To100State.QUESTION) {
+        await endRoundMutation.mutateAsync({ gameCode: code });
+      } else if (
+        gameState === Game0To100State.RESULT ||
+        gameState === Game0To100State.LOBBY
+      ) {
+        await startRoundMutation.mutateAsync({ gameCode: code });
+      }
+    } finally {
+      setIsMutating(false);
+    }
+  };
+
   if (!isClient) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -84,13 +106,7 @@ export default function GamePage() {
         <div className={timeIsUp ? "hidden" : ""}>
           <CountdownTimer
             targetTimestamp={nextAdvanceTimestamp}
-            onComplete={async () => {
-              if (!isMutating) {
-                setIsMutating(true);
-                await mutation.mutateAsync({ gameCode: code });
-                setIsMutating(false);
-              }
-            }}
+            onComplete={handleAdvance}
           />
         </div>
       ) : null}
@@ -105,12 +121,7 @@ export default function GamePage() {
         <ListPlayerAnswerResults playerResults={playerResults} />
       )}
       {process.env.NODE_ENV === "development" && (
-        <Button
-          variant={"secondary"}
-          onClick={async () => {
-            await mutation.mutateAsync({ gameCode: code });
-          }}
-        >
+        <Button variant={"secondary"} onClick={handleAdvance}>
           {timeIsUp ? "Next Question" : "Show answer"}
         </Button>
       )}

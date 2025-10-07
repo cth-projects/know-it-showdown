@@ -1,7 +1,6 @@
 import { postRouter } from "@/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { testRouter } from "./routers/test";
-import { answersRouter } from "./routers/answers";
 import { finalResultRouter } from "./routers/finalResult";
 import { gameRouter } from "./routers/game";
 
@@ -13,7 +12,6 @@ import { gameRouter } from "./routers/game";
 export const appRouter = createTRPCRouter({
   post: postRouter,
   test: testRouter,
-  answers: answersRouter,
   game: gameRouter,
   finalResult: finalResultRouter,
 });

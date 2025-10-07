@@ -14,7 +14,7 @@ export default function SimpleQuestionList() {
   const [hasAdvanced, setHasAdvanced] = useState(false);
   const param = useParams();
   const code = param.code as string;
-  const advanceMutation = api.game.advanceGame.useMutation();
+  const endRoundMutation = api.game.endRound.useMutation();
   const [players, setPlayers] = useState<PlayerStatus[]>([]);
   const [isClient, setIsClient] = useState(false);
 
@@ -57,9 +57,9 @@ export default function SimpleQuestionList() {
       players.length > 0
     ) {
       setHasAdvanced(true);
-      void advanceMutation.mutateAsync({ gameCode: code });
+      void endRoundMutation.mutateAsync({ gameCode: code });
     }
-  }, [players, hasAdvanced, advanceMutation, code]);
+  }, [players, hasAdvanced, endRoundMutation, code]);
 
   if (!isClient) {
     return (
