@@ -40,7 +40,7 @@ function SimpleQuestionList({ players, onSuccess }: Props) {
   return (
     <LayoutGroup>
       <div className="flex flex-col gap-6">
-        <div className="flex min-h-22 flex-row items-center justify-center gap-0">
+        <div className="flex min-h-22 flex-row items-center justify-center gap-2">
           {answeredQuestions.map((player) => (
             <PlayerItem
               key={player.name}
@@ -49,7 +49,7 @@ function SimpleQuestionList({ players, onSuccess }: Props) {
             />
           ))}
         </div>
-        <div className="flex flex-row gap-0">
+        <div className="flex flex-row items-center justify-center gap-2 ">
           {unansweredQuestions.map((player) => (
             <PlayerItem
               key={player.name}
