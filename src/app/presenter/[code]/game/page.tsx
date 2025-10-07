@@ -147,9 +147,7 @@ export default function GamePage() {
       {!timeIsUp ? (
         <AnsweredList
           players={playerStatus}
-          onSuccess={async () => {
-            await endRoundMutation.mutateAsync({ gameCode: code });
-          }}
+          onSuccess={handleAdvance}
         />
       ) : (
         <ListPlayerAnswerResults playerResults={playerResults} />
