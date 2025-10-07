@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import DisplayQuestion from "@/app/_components/displayQuestion";
 import { useCallback, useEffect, useState } from "react";
 import { usePusherContext } from "@/contexts/PusherContext";
-import type { PlayerResult, PresenterGameEvent } from "@/types";
+import type { PlayerResult, PlayerStatus, PresenterGameEvent } from "@/types";
 import ListPlayerAnswerResults from "@/app/_components/listPlayerResults";
 import { Game0To100State } from "@prisma/client";
 
@@ -26,10 +26,15 @@ export default function GamePage() {
   const [isMutating, setIsMutating] = useState(false);
   const [playerResults, setPlayerResults] = useState<PlayerResult[]>([]);
   const [gameState, setGameState] = useState<Game0To100State>();
+  const [playerStatus, setPlayerStatus] = useState<PlayerStatus[]>([]);
 
   const { data: fetchedEvent } = api.game.getCurrentPresenterView.useQuery({
     gameCode: code,
   });
+  const { data: fetchedPlayerStatus } =
+    api.game.getPlayersAnsweredList.useQuery({
+      gameCode: code,
+    });
 
   const eventHandler = useCallback(
     (event: PresenterGameEvent) => {
@@ -46,6 +51,13 @@ export default function GamePage() {
         setResult(event.questionResult.answer);
         setNextAdvanceTimestamp(event.nextAdvanceTimestamp);
         setPlayerResults(event.playerResults);
+        //Resets all players status to false when gamestate changes to result
+        setPlayerStatus((players) =>
+          players.map((player) => ({
+            name: player.name,
+            answered: false,
+          })),
+        );
       } else if (event.newState === Game0To100State.FINAL_RESULT) {
         setNextAdvanceTimestamp("");
         router.push("/presenter/" + code + "/finalResult");
@@ -54,22 +66,39 @@ export default function GamePage() {
     [router, code],
   );
 
+  const playerAnsweredHandler = useCallback(
+    (data: { name: string }) => {
+      setPlayerStatus((players) =>
+        players.map((player) =>
+          player.name === data.name ? { ...player, answered: true } : player,
+        ),
+      );
+    },
+    [setPlayerStatus],
+  );
   useEffect(() => {
     if (fetchedEvent) {
       eventHandler(fetchedEvent);
+    }
+    if (fetchedPlayerStatus) {
+      setPlayerStatus(fetchedPlayerStatus);
+    }
+    if (fetchedEvent && fetchedPlayerStatus) {
       setIsClient(true);
     }
-  }, [eventHandler, fetchedEvent]);
+  }, [eventHandler, fetchedEvent, fetchedPlayerStatus]);
 
   useEffect(() => {
     const channeName = "presenter-" + code;
     const channel = subscribe(channeName);
 
     channel.bind("presenter-advanced", eventHandler);
+    channel.bind("player-answered", playerAnsweredHandler);
     return () => {
       channel.unbind("presenter-advanced", eventHandler);
+      channel.unbind("player-answered", playerAnsweredHandler);
     };
-  }, [code, eventHandler, subscribe, unsubscribe]);
+  }, [code, eventHandler, playerAnsweredHandler, subscribe, unsubscribe]);
 
   const handleAdvance = async () => {
     if (isMutating) return;
@@ -116,7 +145,12 @@ export default function GamePage() {
         showResult={timeIsUp}
       />
       {!timeIsUp ? (
-        <AnsweredList />
+        <AnsweredList
+          players={playerStatus}
+          onSuccess={async () => {
+            await endRoundMutation.mutateAsync({ gameCode: code });
+          }}
+        />
       ) : (
         <ListPlayerAnswerResults playerResults={playerResults} />
       )}
