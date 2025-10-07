@@ -5,6 +5,7 @@ function useCountdown(
   targetScore: number,
   startFrom: number,
   duration: number,
+  onComplete?: () => void,
 ) {
   const [currentScore, setCurrentScore] = useState(startFrom);
 
@@ -26,11 +27,15 @@ function useCountdown(
         requestAnimationFrame(animate);
       } else {
         setCurrentScore(targetScore);
+
+        if (onComplete) {
+          onComplete();
+        }
       }
     };
 
     requestAnimationFrame(animate);
-  }, [targetScore, startFrom, duration]);
+  }, [targetScore, startFrom, duration, onComplete]);
 
   return currentScore;
 }
@@ -41,6 +46,7 @@ interface PlayerAvatarWithScoreProps {
   startFrom?: number;
   duration?: number;
   size?: "sm" | "md" | "lg";
+  onCountdownComplete?: () => void;
 }
 
 const scoreSizeClasses = {
@@ -55,8 +61,14 @@ export default function PlayerAvatarWithScore({
   startFrom = 100,
   duration = 800,
   size = "sm",
+  onCountdownComplete,
 }: PlayerAvatarWithScoreProps) {
-  const animatedScore = useCountdown(score, startFrom, duration);
+  const animatedScore = useCountdown(
+    score,
+    startFrom,
+    duration,
+    onCountdownComplete,
+  );
 
   return (
     <div className="flex flex-col items-center gap-2">
