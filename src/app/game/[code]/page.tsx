@@ -14,9 +14,7 @@ export default function GamePage() {
   const searchParams = useSearchParams();
   const playerName = searchParams.get("playerName");
   const [gameState, setGameState] = useState("LOBBY");
-  const [currentGameData, setCurrentGameData] = useState<QuestionEvent | null>(
-    null,
-  );
+  const [questionData, setQuestionData] = useState<QuestionEvent | null>(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [submittedAnswer, setSubmittedAnswer] = useState<number | undefined>(
     undefined,
@@ -32,7 +30,7 @@ export default function GamePage() {
     channel.bind("game-advance", (data: PlayerGameEvent) => {
       if (data.newState === "QUESTION") {
         setGameState("QUESTION");
-        setCurrentGameData(data);
+        setQuestionData(data);
         setHasSubmitted(false);
         setSubmittedAnswer(undefined);
       } else if (data.newState === "FINAL_RESULT") {
@@ -73,16 +71,16 @@ export default function GamePage() {
     return <Lobby gameCode={code} playerName={playerName} />;
   }
 
-  if (gameState === "QUESTION" && currentGameData) {
+  if (gameState === "QUESTION" && questionData) {
     return (
       <QuestionCard
-        question={currentGameData.currentQuestion}
-        questionEndTimestamp={currentGameData.nextAdvanceTimestamp}
+        question={questionData.currentQuestion}
+        questionEndTimestamp={questionData.nextAdvanceTimestamp}
         onSubmitAnswer={handleSubmitAnswer}
         isSubmitted={hasSubmitted}
         playerAnswer={submittedAnswer}
-        questionIndex={currentGameData.currentQuestionIndex}
-        totalQuestions={currentGameData.totalQuestions}
+        questionIndex={questionData.currentQuestionIndex}
+        totalQuestions={questionData.totalQuestions}
       />
     );
   }
@@ -90,7 +88,12 @@ export default function GamePage() {
   if (gameState === "FINAL_RESULT") {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center space-y-6">
-        <div className="text-3xl font-bold">GG WP, game is finished!</div>
+        <div className="text-3xl font-bold">
+          Thanks for playing, game is finished!
+        </div>
+        <p className="text-lg text-gray-300">
+          Please see the presenter view for results.
+        </p>
         <button
           onClick={() => router.push(`/`)}
           className="rounded-lg bg-gray-600 px-6 py-3 text-white transition-colors hover:bg-gray-700"

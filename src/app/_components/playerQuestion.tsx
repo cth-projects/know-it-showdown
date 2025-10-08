@@ -33,38 +33,24 @@ export default function QuestionCard({
   isSubmitted = false,
   playerAnswer,
 }: QuestionCardProps) {
-  const [numberAnswer, setNumberAnswer] = useState<string>("0");
-
-  const clampAnswer = (value: number): number => {
-    if (value < 0) return 0;
-    if (value > 100) return 100;
-    return value;
-  };
-
-  const handleSubmit = () => {
-    let numericAnswer = parseInt(numberAnswer);
-
-    if (isNaN(numericAnswer) || numberAnswer.trim() === "") {
-      numericAnswer = 0;
-    }
-
-    const clampedAnswer = clampAnswer(numericAnswer);
-    onSubmitAnswer(clampedAnswer);
-  };
+  const [numberAnswer, setNumberAnswer] = useState<string>("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    const rawValue = e.target.value;
 
-    if (value === "") {
+    if (rawValue === "") {
       setNumberAnswer("");
       return;
     }
 
-    const numericValue = parseInt(value);
+    const numericValue = Math.max(0, Math.min(100, parseInt(rawValue, 10)));
 
-    if (!isNaN(numericValue)) {
-      setNumberAnswer(value);
-    }
+    setNumberAnswer(numericValue.toString());
+  };
+
+  const handleSubmit = () => {
+    const finalAnswer = numberAnswer === "" ? 0 : parseInt(numberAnswer, 10);
+    onSubmitAnswer(finalAnswer);
   };
 
   const renderAnswerInput = () => {
@@ -75,6 +61,7 @@ export default function QuestionCard({
           value={numberAnswer}
           onChange={handleInputChange}
           disabled={isSubmitted}
+          placeholder="0"
           className="mx-auto flex max-w-28 p-4 text-center text-lg"
           min="0"
           max="100"
@@ -84,13 +71,6 @@ export default function QuestionCard({
             }
           }}
         />
-        {numberAnswer &&
-          !isNaN(parseInt(numberAnswer)) &&
-          (parseInt(numberAnswer) < 0 || parseInt(numberAnswer) > 100) && (
-            <p className="text-center text-sm text-yellow-400">
-              Will be clamped to: {clampAnswer(parseInt(numberAnswer))}
-            </p>
-          )}
       </div>
     );
   };
