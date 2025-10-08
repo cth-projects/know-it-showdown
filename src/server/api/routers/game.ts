@@ -302,8 +302,6 @@ export const gameRouter = createTRPCRouter({
         Game0To100State.RESULT,
         updatedGame,
       );
-
-      return updatedGame;
     }),
 
   getCurrentPresenterView: publicProcedure

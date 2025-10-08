@@ -111,7 +111,7 @@ export function buildFinalResultEvent(
   game: GameWithRelations,
 ): FinalResultEvent {
   const finalResults = game.players
-    .sort((a, b) => b.score - a.score)
+    .sort((a, b) => a.score - b.score)
     .map((player, index) => ({
       rank: index + 1,
       name: player.name,

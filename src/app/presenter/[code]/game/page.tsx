@@ -8,7 +8,7 @@ import DisplayQuestion from "@/app/_components/displayQuestion";
 import { useCallback, useEffect, useState } from "react";
 import { usePusherContext } from "@/contexts/PusherContext";
 import type { PlayerResult, PlayerStatus, PresenterGameEvent } from "@/types";
-import ListPlayerAnswerResults from "@/app/_components/listPlayerResults";
+import QuestionResult from "@/app/_components/questionResult";
 import { Game0To100State } from "@prisma/client";
 
 export default function GamePage() {
@@ -60,7 +60,7 @@ export default function GamePage() {
         );
       } else if (event.newState === Game0To100State.FINAL_RESULT) {
         setNextAdvanceTimestamp("");
-        router.push("/presenter/" + code + "/finalResult");
+        router.push("/presenter/" + code + "/final-result");
       }
     },
     [router, code],
@@ -147,7 +147,7 @@ export default function GamePage() {
       {!timeIsUp ? (
         <AnsweredList players={playerStatus} onSuccess={handleAdvance} />
       ) : (
-        <ListPlayerAnswerResults playerResults={playerResults} />
+        <QuestionResult playerResults={playerResults} />
       )}
       {process.env.NODE_ENV === "development" && (
         <Button variant={"secondary"} onClick={handleAdvance}>

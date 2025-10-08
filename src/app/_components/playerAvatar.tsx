@@ -27,6 +27,7 @@ const AVATAR_COLORS = [
 interface PlayerAvatarProps {
   name: string;
   size?: "sm" | "md" | "lg";
+  layout?: "vertical" | "horizontal";
 }
 
 const getColorFromName = (name: string): string => {
@@ -47,13 +48,24 @@ const sizeClasses = {
   lg: { avatar: "h-24 w-24", text: "text-3xl", label: "text-base" },
 };
 
-export default function PlayerAvatar({ name, size = "sm" }: PlayerAvatarProps) {
+export default function PlayerAvatar({
+  name,
+  size = "sm",
+  layout = "vertical",
+}: PlayerAvatarProps) {
   const bgColor = getColorFromName(name);
   const initial = getInitial(name);
   const classes = sizeClasses[size];
 
+  const containerClass =
+    layout === "vertical"
+      ? "flex flex-col items-center gap-2"
+      : "flex flex-row items-center gap-3";
+
+  const labelClass = layout === "vertical" ? "text-center" : "text-left";
+
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className={containerClass}>
       <Avatar className={`${classes.avatar} ${bgColor}`}>
         <AvatarFallback
           className={`${bgColor} font-semibold text-white ${classes.text}`}
@@ -62,7 +74,7 @@ export default function PlayerAvatar({ name, size = "sm" }: PlayerAvatarProps) {
         </AvatarFallback>
       </Avatar>
       <span
-        className={`${classes.label} text-center font-medium text-gray-700`}
+        className={`${classes.label} ${labelClass} font-medium text-gray-700`}
       >
         {name}
       </span>
