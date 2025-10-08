@@ -1,5 +1,5 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion, AnimatePresence } from "motion/react";
 
 type DisplayProps = {
   question: string;
@@ -9,27 +9,43 @@ type DisplayProps = {
 
 function Display({ question, result, showResult }: DisplayProps) {
   return (
-    <div>
-      <Card className="mx-auto mb-1 w-full max-w-4xl">
-        <CardHeader>
-          <CardTitle className="text-2xl">Question:</CardTitle>
-        </CardHeader>
-        <CardContent className="text-5xl">{question}</CardContent>
-
-        {showResult ? (
-          <>
-            <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
-                Correct answer:
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-5xl text-green-600">
-              {result}
-            </CardContent>
-          </>
-        ) : null}
-      </Card>
-    </div>
+    <motion.div 
+      layout 
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      className="flex flex-col items-center gap-8"
+    >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={question} 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          //TODO:
+          //Testa om man ska ha en exit transistion, ser lite buggigt ut.
+          //kanske bättre utan
+          //exit={{ opacity: 0, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-[80vw] text-5xl text-center"
+        >
+          {question}
+        </motion.div>
+      </AnimatePresence>
+      <AnimatePresence>
+        {showResult && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 300,
+              damping: 20,
+            }}
+            className="text-5xl text-green-600"
+          >
+            {result}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
 
