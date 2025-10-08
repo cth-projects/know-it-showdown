@@ -19,10 +19,6 @@ function Display({ question, result, showResult }: DisplayProps) {
           key={question} 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          //TODO:
-          //Testa om man ska ha en exit transistion, ser lite buggigt ut.
-          //kanske bättre utan
-          //exit={{ opacity: 0, y: 0 }}
           transition={{ duration: 0.5 }}
           className="w-[80vw] text-5xl text-center"
         >
