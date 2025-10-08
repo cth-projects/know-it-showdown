@@ -12,12 +12,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { QuestionEvent } from "@/types";
+import CountdownTimer from "./countdownTimer";
 
 interface QuestionCardProps {
   question: QuestionEvent["currentQuestion"];
   questionIndex: number;
   totalQuestions: number;
-  timeLeft: number;
+  questionEndTimestamp: string;
   onSubmitAnswer: (answer: number) => void;
   isSubmitted?: boolean;
   playerAnswer?: number;
@@ -27,7 +28,7 @@ export default function QuestionCard({
   question,
   questionIndex,
   totalQuestions,
-  timeLeft,
+  questionEndTimestamp,
   onSubmitAnswer,
   isSubmitted = false,
   playerAnswer,
@@ -71,7 +72,6 @@ export default function QuestionCard({
       <div className="space-y-2">
         <Input
           type="number"
-          placeholder="0"
           value={numberAnswer}
           onChange={handleInputChange}
           disabled={isSubmitted}
@@ -95,12 +95,6 @@ export default function QuestionCard({
     );
   };
 
-  const getTimerColor = () => {
-    if (timeLeft < 30) return "text-yellow-400";
-    else if (timeLeft < 15) return "text-red-400";
-    return "text-white-400";
-  };
-
   return (
     <Card className="mx-auto w-full max-w-2xl">
       <CardHeader className="text-center">
@@ -108,9 +102,9 @@ export default function QuestionCard({
           <div className="text-sm text-gray-400">
             Question {questionIndex + 1} of {totalQuestions}
           </div>
-          <div className={`text-2xl font-bold ${getTimerColor()}`}>
-            {timeLeft > 0 ? `${timeLeft}s` : "Time's up!"}
-          </div>
+          <CountdownTimer
+            targetTimestamp={questionEndTimestamp}
+          ></CountdownTimer>
         </div>
         <CardTitle className="text-xl md:text-2xl">
           {question.question}
@@ -141,7 +135,6 @@ export default function QuestionCard({
               onClick={handleSubmit}
               disabled={
                 isSubmitted ||
-                timeLeft <= 0 ||
                 !numberAnswer.trim() ||
                 isNaN(parseInt(numberAnswer))
               }

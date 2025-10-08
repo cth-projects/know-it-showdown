@@ -3,54 +3,54 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { usePusherContext } from "@/contexts/PusherContext";
 import QuestionCard from "@/app/_components/playerQuestion";
-import type { QuestionEvent } from "@/types";
+import type { PlayerGameEvent, QuestionEvent } from "@/types";
 import Lobby from "@/components/game/lobby";
 import { api } from "@/trpc/react";
+import { useRouter } from "next/navigation";
 
 export default function GamePage() {
   const params = useParams();
   const code = params.code as string;
-
   const searchParams = useSearchParams();
   const playerName = searchParams.get("playerName");
-
   const [gameState, setGameState] = useState("LOBBY");
-  const [currentQuestion, setCurrentQuestion] = useState<
-    QuestionEvent["currentQuestion"] | null
-  >(null);
-
-  const [timeLeft, setTimeLeft] = useState<number>(120);
-
+  const [currentGameData, setCurrentGameData] = useState<QuestionEvent | null>(
+    null,
+  );
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [submittedAnswer, setSubmittedAnswer] = useState<number | undefined>(
+    undefined,
+  );
+  const router = useRouter();
+  const submitAnswerMutation = api.game.submitAnswer.useMutation();
   const { subscribe, unsubscribe } = usePusherContext();
 
   useEffect(() => {
-    if (!subscribe || !unsubscribe) return;
+    const channelName = "player-" + code;
+    const channel = subscribe(channelName);
 
-    const channel = subscribe(`player-${code}`);
-
-    if (!channel) return;
-
-    channel.bind("game-advance", (data: QuestionEvent) => {
+    channel.bind("game-advance", (data: PlayerGameEvent) => {
       if (data.newState === "QUESTION") {
         setGameState("QUESTION");
-        setCurrentQuestion(data.currentQuestion);
-        setTimeLeft(120); // TODO: should get timer from somewhere else
+        setCurrentGameData(data);
+        setHasSubmitted(false);
+        setSubmittedAnswer(undefined);
+      } else if (data.newState === "FINAL_RESULT") {
+        setGameState("FINAL_RESULT");
       }
     });
 
     return () => {
       channel.unbind_all();
-      unsubscribe(`player-${code}`);
+      unsubscribe(channelName);
     };
-  }, [code, subscribe, timeLeft, unsubscribe]);
-
-  const submitAnswerMutation = api.game.submitAnswer.useMutation();
+  }, [code, subscribe, unsubscribe]);
 
   const handleSubmitAnswer = async (answer: number) => {
-    if (!playerName) {
-      console.error("No player name");
-      return;
-    }
+    if (!playerName) return;
+
+    setHasSubmitted(true);
+    setSubmittedAnswer(answer);
 
     await submitAnswerMutation.mutateAsync(
       {
@@ -73,15 +73,31 @@ export default function GamePage() {
     return <Lobby gameCode={code} playerName={playerName} />;
   }
 
-  if (gameState === "QUESTION" && currentQuestion) {
+  if (gameState === "QUESTION" && currentGameData) {
     return (
       <QuestionCard
-        question={currentQuestion}
-        timeLeft={timeLeft}
+        question={currentGameData.currentQuestion}
+        questionEndTimestamp={currentGameData.nextAdvanceTimestamp}
         onSubmitAnswer={handleSubmitAnswer}
-        questionIndex={0}
-        totalQuestions={0}
+        isSubmitted={hasSubmitted}
+        playerAnswer={submittedAnswer}
+        questionIndex={currentGameData.currentQuestionIndex}
+        totalQuestions={currentGameData.totalQuestions}
       />
+    );
+  }
+
+  if (gameState === "FINAL_RESULT") {
+    return (
+      <div className="flex h-screen w-full flex-col items-center justify-center space-y-6">
+        <div className="text-3xl font-bold">GG WP, game is finished!</div>
+        <button
+          onClick={() => router.push(`/`)}
+          className="rounded-lg bg-gray-600 px-6 py-3 text-white transition-colors hover:bg-gray-700"
+        >
+          Back to home
+        </button>
+      </div>
     );
   }
 
