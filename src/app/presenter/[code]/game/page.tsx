@@ -145,10 +145,7 @@ export default function GamePage() {
         showResult={timeIsUp}
       />
       {!timeIsUp ? (
-        <AnsweredList
-          players={playerStatus}
-          onSuccess={handleAdvance}
-        />
+        <AnsweredList players={playerStatus} onSuccess={handleAdvance} />
       ) : (
         <ListPlayerAnswerResults playerResults={playerResults} />
       )}

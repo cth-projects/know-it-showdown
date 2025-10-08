@@ -132,3 +132,192 @@
     /* ... other CSS variables */
   }
 }
+
+/* ============================================
+   COUNTDOWN TIMER ANIMATIONS
+   ============================================ */
+
+/* WARNING LEVEL: 30s - Very gentle pulse */
+@keyframes warningPulsate {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 0.92;
+  }
+}
+
+/* URGENT LEVEL: 10s - Moderate pulse */
+@keyframes urgentPulsate {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.88;
+  }
+}
+
+/* CRITICAL LEVEL: 5s - Noticeable but not aggressive */
+@keyframes criticalPulsate {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.85;
+  }
+}
+
+/* ==========================================
+   GLOW ANIMATIONS (Subtle Shadows)
+   ========================================== */
+
+/* WARNING GLOW: Barely noticeable purple hint */
+@keyframes warningGlow {
+  0%,
+  100% {
+    box-shadow: 0 2px 10px rgba(46, 2, 109, 0.08);
+    background-color: rgba(46, 2, 109, 0.02);
+  }
+  50% {
+    box-shadow: 0 4px 15px rgba(46, 2, 109, 0.15);
+    background-color: rgba(46, 2, 109, 0.04);
+  }
+}
+
+/* URGENT GLOW: Gentle violet glow */
+@keyframes urgentGlow {
+  0%,
+  100% {
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.12);
+    background-color: rgba(139, 92, 246, 0.03);
+  }
+  50% {
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.22);
+    background-color: rgba(139, 92, 246, 0.06);
+  }
+}
+
+/* CRITICAL GLOW: Clear but refined purple glow */
+@keyframes criticalGlow {
+  0%,
+  100% {
+    box-shadow: 0 6px 20px rgba(168, 85, 247, 0.18);
+    background-color: rgba(168, 85, 247, 0.05);
+  }
+  50% {
+    box-shadow: 0 8px 25px rgba(168, 85, 247, 0.3);
+    background-color: rgba(168, 85, 247, 0.1);
+  }
+}
+
+/* ==========================================
+   UTILITY CLASSES
+   ========================================== */
+
+/* Pulsate animations - slightly slower for calmness */
+.animate-warning-pulsate {
+  animation: warningPulsate 2s ease-in-out infinite;
+}
+
+.animate-urgent-pulsate {
+  animation: urgentPulsate 1.2s ease-in-out infinite;
+}
+
+.animate-critical-pulsate {
+  animation: criticalPulsate 0.6s ease-in-out infinite;
+}
+
+/* Glow animations - matching speeds */
+.animate-warning-glow {
+  animation: warningGlow 2s ease-in-out infinite;
+}
+
+.animate-urgent-glow {
+  animation: urgentGlow 1.2s ease-in-out infinite;
+}
+
+.animate-critical-glow {
+  animation: criticalGlow 0.6s ease-in-out infinite;
+}
+
+/* Time's Up badge */
+.animate-times-up-clean {
+  animation:
+    timesUpClean 0.5s ease-out forwards,
+    timesUpSubtleGlow 2.5s ease-in-out 0.5s infinite;
+}
+
+/* Optional: Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-warning-pulsate,
+  .animate-urgent-pulsate,
+  .animate-critical-pulsate,
+  .animate-warning-glow,
+  .animate-urgent-glow,
+  .animate-critical-glow,
+  .animate-gentle-shake,
+  .animate-moderate-shake,
+  .animate-times-up-clean {
+    animation: none;
+  }
+}
+/* ==========================================
+   TIME'S UP
+   ========================================== */
+
+/* Simple fade-in */
+@keyframes timesUpMinimal {
+  0% {
+    opacity: 0;
+    letter-spacing: 0.5em;
+  }
+  100% {
+    opacity: 1;
+    letter-spacing: 0.3em;
+  }
+}
+
+.animate-times-up-minimal {
+  animation: timesUpMinimal 0.6s ease-out forwards;
+  text-shadow: 0 2px 20px rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================
+   TIME'S UP BADGE ANIMATION v2
+   ========================================== */
+
+/* Simple fade-in with gentle scale */
+@keyframes timesUpClean {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Subtle, elegant glow */
+@keyframes timesUpSubtleGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 4px 20px rgba(46, 2, 109, 0.25),
+      0 0 30px rgba(139, 92, 246, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 4px 25px rgba(46, 2, 109, 0.35),
+      0 0 40px rgba(139, 92, 246, 0.25);
+  }
+}

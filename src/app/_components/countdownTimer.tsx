@@ -17,7 +17,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
     const calculateTimeLeft = () => {
       const now = Date.now();
       const target = new Date(targetTimestamp).getTime();
-      const difference = Math.max(0, Math.ceil((target - now) / 1000));
+      const difference = Math.max(0, Math.ceil((target - now) / 1000) - 1);
       return difference;
     };
 
@@ -31,53 +31,62 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
       if (remaining <= 0) {
         setIsActive(false);
         clearInterval(intervalId);
+
         if (onComplete) {
           onComplete();
         }
       }
-    }, 100);
+    }, 50);
 
     return () => clearInterval(intervalId);
   }, [targetTimestamp, onComplete]);
 
   const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+    return `${seconds.toString()}`;
   };
 
   const getTimerColor = () => {
     if (!isActive) return "text-red-600";
-    if (timeLeft <= 10) return "text-red-500";
-    if (timeLeft <= 30) return "text-orange-500";
+    if (timeLeft <= 5) return "text-red-500";
+    if (timeLeft <= 10) return "text-orange-500";
     return "text-foreground";
   };
 
-  const getBackgroundColor = () => {
-    if (!isActive) return "bg-red-50 border-red-200";
-    if (timeLeft <= 10) return "bg-red-50 border-red-200";
-    if (timeLeft <= 30) return "bg-orange-50 border-orange-200";
+  const getTimerAnimation = () => {
+    if (!isActive) return "";
+    if (timeLeft <= 5) return "animate-critical-pulsate";
+    if (timeLeft <= 10) return "animate-urgent-pulsate";
+    if (timeLeft <= 15) return "animate-warning-pulsate";
+    return "";
+  };
+
+  const getCardAnimation = () => {
+    if (!isActive) return "bg-purple-500/30 shadow-xl shadow-purple-500/50";
+    if (timeLeft <= 5) return "animate-critical-glow";
+    if (timeLeft <= 10) return "animate-urgent-glow";
+    if (timeLeft <= 15) return "animate-warning-glow";
     return "";
   };
 
   return (
-    <Card className={`mx-auto w-fit ${getBackgroundColor()}`}>
-      <CardContent className="p-4">
+    <Card className="mx-auto w-fit border-0 bg-transparent p-2">
+      <CardContent className={`p-4 ${getCardAnimation()}`}>
         <div className="text-center">
           <div className="flex items-center justify-center space-x-2">
             {!isActive ? (
-              <Badge variant="destructive" className="text-2xl">
-                Time&apos;s Up!
-              </Badge>
+              <div className="animate-times-up-clean font-mono text-7xl tracking-wider text-white uppercase">
+                TIME&apos;S UP
+              </div>
             ) : (
-              <Badge variant="outline" className="text-2xl">
-                Time left
+              <Badge
+                variant="outline"
+                className="font-bold} w-[5ch] border-white/5 bg-white/1 p-2 font-mono text-8xl"
+              >
+                <div className={` ${getTimerAnimation()} ${getTimerColor()}`}>
+                  {formatTime(timeLeft)}
+                </div>
               </Badge>
             )}
-          </div>
-
-          <div className={`font-mono text-6xl font-bold ${getTimerColor()}`}>
-            {formatTime(timeLeft)}
           </div>
         </div>
       </CardContent>
