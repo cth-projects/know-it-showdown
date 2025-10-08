@@ -47,7 +47,7 @@ export const gameRouter = createTRPCRouter({
     .input(
       z.object({
         gameCode: z.string().min(1, "Game code is required"),
-        playerName: z.string().min(1, "Player name is required"),
+        playerName: z.string().min(1, "Player name is required").max(12),
       }),
     )
     .mutation(async ({ input, ctx }) => {

@@ -14,8 +14,8 @@ type ResultPodiumProps = {
 
 export default function ResultPodium({
   finalResults,
-  baseCountdownDuration = 1000,
-  transitionDelay = 500,
+  baseCountdownDuration = 1500,
+  transitionDelay = 1000,
 }: ResultPodiumProps) {
   const [playersInPodium, setPlayersInPodium] = useState<Set<string>>(
     new Set(),
@@ -28,7 +28,7 @@ export default function ResultPodium({
     const positionFromLast = totalPlayers - rank + 1;
 
     if (rank < 4) {
-      return (totalPlayers + 1) * baseCountdownDuration;
+      return (totalPlayers + 2) * baseCountdownDuration;
     }
 
     return positionFromLast * baseCountdownDuration;

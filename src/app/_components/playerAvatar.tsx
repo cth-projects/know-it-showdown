@@ -68,13 +68,13 @@ export default function PlayerAvatar({
     <div className={containerClass}>
       <Avatar className={`${classes.avatar} ${bgColor}`}>
         <AvatarFallback
-          className={`${bgColor} font-semibold text-white ${classes.text}`}
+          className={`${bgColor} font-semibold text-gray-200 ${classes.text}`}
         >
           {initial}
         </AvatarFallback>
       </Avatar>
       <span
-        className={`${classes.label} ${labelClass} font-medium text-gray-700`}
+        className={`${classes.label} ${labelClass} font-medium text-gray-200`}
       >
         {name}
       </span>

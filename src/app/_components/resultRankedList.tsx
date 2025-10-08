@@ -59,7 +59,7 @@ export default function ResultRankedList({
   }
 
   const renderSingleColumn = (playersToRender: PlayerResult[]) => (
-    <div className="grid grid-cols-[64px_100px_80px_64px] items-center gap-x-8 gap-y-2">
+    <div className="grid grid-cols-[64px_140px_80px_64px] items-center gap-x-8 gap-y-2">
       {/* Header Row */}
       <div className="text-center">
         <span className="text-lg font-semibold text-gray-400">#</span>
@@ -110,7 +110,13 @@ export default function ResultRankedList({
               }}
               className="flex items-center justify-center"
             >
-              <PlayerAvatar name={result.name} size="sm" layout="horizontal" />
+              <div className="flex w-[140px] items-center justify-start">
+                <PlayerAvatar
+                  name={result.name}
+                  size="sm"
+                  layout="horizontal"
+                />
+              </div>
             </motion.div>
 
             {/* Answer */}

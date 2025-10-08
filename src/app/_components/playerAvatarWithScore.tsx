@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PlayerAvatar from "./playerAvatar";
 
 function useCountdown(
@@ -8,34 +8,42 @@ function useCountdown(
   onComplete?: () => void,
 ) {
   const [currentScore, setCurrentScore] = useState(startFrom);
+  const onCompleteRef = useRef(onComplete);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   useEffect(() => {
     const startTime = Date.now();
     const difference = startFrom - targetScore;
+    let hasCompleted = false;
 
     const animate = () => {
+      if (hasCompleted) return;
+
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
 
-      // Easing function for smooth animation (easeOutCubic)
-      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const easeOut = 1 - Math.pow(1 - progress, 8);
 
       const newScore = Math.round(startFrom - difference * easeOut);
       setCurrentScore(newScore);
 
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
+      if (newScore === targetScore || progress >= 1) {
+        hasCompleted = true;
         setCurrentScore(targetScore);
 
-        if (onComplete) {
-          onComplete();
+        if (onCompleteRef.current) {
+          onCompleteRef.current();
         }
+      } else {
+        requestAnimationFrame(animate);
       }
     };
 
     requestAnimationFrame(animate);
-  }, [targetScore, startFrom, duration, onComplete]);
+  }, [targetScore, startFrom, duration]);
 
   return currentScore;
 }

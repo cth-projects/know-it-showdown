@@ -36,13 +36,13 @@ export default function FinalCountdownGrid({
         : Math.ceil(totalPlayers / MAX_PLAYERS_PER_ROW);
     const playersPerRow = Math.ceil(totalPlayers / numRows);
 
-    const sortedPlayers = [...players].sort((a, b) => b.rank - a.rank);
+    const shuffledPlayers = [...players].sort(() => Math.random() - 0.5);
 
     const playerPositions = new Map<
       string,
       { row: number; position: number }
     >();
-    sortedPlayers.forEach((player, index) => {
+    shuffledPlayers.forEach((player, index) => {
       const rowIndex = Math.floor(index / playersPerRow);
       const positionInRow = index % playersPerRow;
       playerPositions.set(player.name, {

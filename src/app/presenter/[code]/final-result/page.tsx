@@ -59,8 +59,8 @@ export default function FinalResult() {
 
         <ResultPodium
           finalResults={finalResultEvent.finalResults}
-          baseCountdownDuration={1000}
-          transitionDelay={500}
+          baseCountdownDuration={1500}
+          transitionDelay={1000}
         />
       </div>
     </main>

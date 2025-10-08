@@ -39,7 +39,7 @@ export default function FinalRankedList({
   }
 
   const renderSingleColumn = (playersToRender: FinalPlayer[]) => (
-    <div className="grid grid-cols-[64px_100px_64px] items-center gap-x-8 gap-y-2">
+    <div className="grid grid-cols-[64px_140px_64px] items-center gap-x-8 gap-y-2">
       {/* Header Row */}
       <div className="text-center">
         <span className="text-lg font-semibold text-gray-400">#</span>
@@ -88,7 +88,13 @@ export default function FinalRankedList({
               }}
               className="flex items-center justify-center"
             >
-              <PlayerAvatar name={player.name} size="sm" layout="horizontal" />
+              <div className="flex w-[140px] items-center justify-start">
+                <PlayerAvatar
+                  name={player.name}
+                  size="sm"
+                  layout="horizontal"
+                />
+              </div>
             </motion.div>
 
             {/* Final Score */}
