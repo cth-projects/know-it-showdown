@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion } from "motion/react";
 import { Trophy, Medal, Award } from "lucide-react";
 import PlayerAvatar from "./playerAvatar";
@@ -10,17 +10,35 @@ type ResultPodiumProps = {
   finalResults: FinalResultEvent["finalResults"];
   baseCountdownDuration?: number;
   transitionDelay?: number;
+  onAllAnimationsComplete: () => void;
 };
 
 export default function ResultPodium({
   finalResults,
   baseCountdownDuration = 1500,
   transitionDelay = 1000,
+  onAllAnimationsComplete,
 }: ResultPodiumProps) {
   const [playersInPodium, setPlayersInPodium] = useState<Set<string>>(
     new Set(),
   );
   const [playersInList, setPlayersInList] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const allPlayersPlaced =
+      playersInPodium.size + playersInList.size === finalResults.length;
+
+    if (allPlayersPlaced && onAllAnimationsComplete) {
+      setTimeout(() => {
+        onAllAnimationsComplete();
+      }, 1000);
+    }
+  }, [
+    playersInPodium.size,
+    playersInList.size,
+    finalResults.length,
+    onAllAnimationsComplete,
+  ]);
 
   const getCountdownDuration = (rank: number) => {
     const totalPlayers = finalResults.length;
