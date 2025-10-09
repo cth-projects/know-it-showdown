@@ -346,6 +346,8 @@ export const gameRouter = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND", message: "Game not found" });
       }
 
+      const isQuestionState = game.gameState === Game0To100State.QUESTION;
+
       const playerStatusList: PlayerStatus[] = [];
 
       for (const player of game.players) {
@@ -354,7 +356,7 @@ export const gameRouter = createTRPCRouter({
 
         playerStatusList.push({
           name: player.name,
-          answered: hasAnswered,
+          answered: isQuestionState ? hasAnswered : false,
         });
       }
 
