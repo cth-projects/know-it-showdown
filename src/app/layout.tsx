@@ -7,6 +7,7 @@ import { TRPCReactProvider } from "@/trpc/react";
 
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { PusherProvider } from "@/contexts/PusherContext";
+import { AudioProvider } from "@/contexts/AudioContext";
 
 export const metadata: Metadata = {
   title: "Know-it Showdown",
@@ -25,7 +26,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${geist.variable}`}>
-      <body className="bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white min-h-screen">
+      <body className="min-h-screen bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
         <PusherProvider>
           <ThemeProvider
             attribute="class"
@@ -33,7 +34,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <TRPCReactProvider>{children}</TRPCReactProvider>
+            <AudioProvider>
+              <TRPCReactProvider>{children}</TRPCReactProvider>
+            </AudioProvider>
           </ThemeProvider>
         </PusherProvider>
       </body>

@@ -4,7 +4,7 @@ import GameCode from "src/app/_components/displayGameCode";
 import PlayerList from "@/app/_components/playerList";
 import { GameSettings } from "@/app/_components/gameSettings";
 import StartButton from "@/app/_components/startGameButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Gamepad2 } from "lucide-react";
 import QRCode from "@/app/_components/displayQRCode";
+import { audioManager } from "@/lib/audioManager";
 
 interface GameSettingsState {
   timePerQuestion: number;
@@ -27,6 +28,19 @@ const DEFAULT_SETTINGS: GameSettingsState = {
 };
 
 export default function LobbyPage() {
+  // TODO: Only as an example > remove after implementing audio
+  useEffect(() => {
+    // Play sound ONCE when page loads
+    // audioManager.play("testPlayOnce");
+
+    // Start looping background music
+    audioManager.startLoop("testLoop", { volumeModifier: -0.3 });
+
+    // Stop looping sound when component unmounts
+    return () => {
+      audioManager.stop("testLoop");
+    };
+  }, []);
   const [gameSettings, setGameSettings] =
     useState<GameSettingsState>(DEFAULT_SETTINGS);
 
