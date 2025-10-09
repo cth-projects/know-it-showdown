@@ -27,6 +27,7 @@ export default function GamePage() {
   const [playerResults, setPlayerResults] = useState<PlayerResult[]>([]);
   const [gameState, setGameState] = useState<Game0To100State>();
   const [playerStatus, setPlayerStatus] = useState<PlayerStatus[]>([]);
+  const [gameData, setGameData] = useState<PresenterGameEvent>();
 
   const { data: fetchedEvent } = api.game.getCurrentPresenterView.useQuery({
     gameCode: code,
@@ -39,6 +40,7 @@ export default function GamePage() {
   const eventHandler = useCallback(
     (event: PresenterGameEvent) => {
       setGameState(event.newState);
+      setGameData(event);
 
       if (event.newState === Game0To100State.QUESTION) {
         setNextAdvanceTimestamp(event.nextAdvanceTimestamp);
@@ -139,6 +141,14 @@ export default function GamePage() {
           />
         </div>
       ) : null}
+
+      {gameData && !timeIsUp && (
+        <div>
+          <span className="text-4xl font-bold text-purple-600 dark:text-white">
+            {gameData.currentQuestionIndex + 1}/{gameData.totalQuestions}
+          </span>
+        </div>
+      )}
       <DisplayQuestion
         question={question ?? ""}
         result={result ?? 0}
