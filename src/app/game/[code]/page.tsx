@@ -7,13 +7,16 @@ import type { PlayerGameEvent, QuestionEvent } from "@/types";
 import Lobby from "@/components/game/lobby";
 import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
+import { Game0To100State } from "@prisma/client";
 
 export default function GamePage() {
   const params = useParams();
   const code = params.code as string;
   const searchParams = useSearchParams();
   const playerName = searchParams.get("playerName");
-  const [gameState, setGameState] = useState("LOBBY");
+  const [gameState, setGameState] = useState<Game0To100State>(
+    Game0To100State.LOBBY,
+  );
   const [questionData, setQuestionData] = useState<QuestionEvent | null>(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [submittedAnswer, setSubmittedAnswer] = useState<number | undefined>(
@@ -28,13 +31,15 @@ export default function GamePage() {
     const channel = subscribe(channelName);
 
     channel.bind("game-advance", (data: PlayerGameEvent) => {
-      if (data.newState === "QUESTION") {
-        setGameState("QUESTION");
+      if (data.newState === Game0To100State.QUESTION) {
+        setGameState(Game0To100State.QUESTION);
         setQuestionData(data);
         setHasSubmitted(false);
         setSubmittedAnswer(undefined);
-      } else if (data.newState === "FINAL_RESULT") {
-        setGameState("FINAL_RESULT");
+      } else if (data.newState === Game0To100State.RESULT) {
+        setGameState(Game0To100State.RESULT);
+      } else if (data.newState === Game0To100State.FINAL_RESULT) {
+        setGameState(Game0To100State.FINAL_RESULT);
       }
     });
 
@@ -50,28 +55,21 @@ export default function GamePage() {
     setHasSubmitted(true);
     setSubmittedAnswer(answer);
 
-    await submitAnswerMutation.mutateAsync(
-      {
+    try {
+      await submitAnswerMutation.mutateAsync({
         gameCode: code,
         playerName: playerName,
         answer: answer,
-      },
-      {
-        onSuccess: (data) => {
-          console.log("Answer submitted successfully:", data);
-        },
-        onError: (error) => {
-          console.error("Failed to submit answer:", error);
-        },
-      },
-    );
+      });
+    } catch {
+      setHasSubmitted(false);
+      setSubmittedAnswer(undefined);
+    }
   };
 
-  if (gameState === "LOBBY") {
+  if (gameState === Game0To100State.LOBBY) {
     return <Lobby gameCode={code} playerName={playerName} />;
-  }
-
-  if (gameState === "QUESTION" && questionData) {
+  } else if (gameState === Game0To100State.QUESTION && questionData) {
     return (
       <QuestionCard
         question={questionData.currentQuestion}
@@ -83,16 +81,16 @@ export default function GamePage() {
         totalQuestions={questionData.totalQuestions}
       />
     );
-  }
-
-  if (gameState === "FINAL_RESULT") {
+  } else if (gameState === Game0To100State.RESULT) {
+    <div className="flex h-screen w-full flex-col items-center justify-center space-y-6">
+      Waiting for next question!
+    </div>;
+  } else if (gameState === Game0To100State.FINAL_RESULT) {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center space-y-6">
-        <div className="text-3xl font-bold">
-          Thanks for playing, game is finished!
-        </div>
+        <div className="text-3xl font-bold">GG WP, thanks for playing!</div>
         <p className="text-lg text-gray-300">
-          Please see the presenter view for results.
+          Please see the presenter screen for results.
         </p>
         <button
           onClick={() => router.push(`/`)}

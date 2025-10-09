@@ -53,7 +53,7 @@ export interface FinalResultEvent extends BaseGameEvent {
   };
 }
 
-export type PlayerGameEvent = QuestionEvent | FinalResultEvent;
+export type PlayerGameEvent = QuestionEvent | ResultEvent | FinalResultEvent;
 
 export type PresenterGameEvent = QuestionEvent | ResultEvent | FinalResultEvent;
 

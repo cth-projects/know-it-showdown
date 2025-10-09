@@ -43,6 +43,11 @@ export default function QuestionCard({
       return;
     }
 
+    const parsed = parseInt(rawValue, 10);
+    if (isNaN(parsed)) {
+      return;
+    }
+
     const numericValue = Math.max(0, Math.min(100, parseInt(rawValue, 10)));
 
     setNumberAnswer(numericValue.toString());
@@ -115,7 +120,7 @@ export default function QuestionCard({
               onClick={handleSubmit}
               disabled={
                 isSubmitted ||
-                !numberAnswer.trim() ||
+                numberAnswer === "" ||
                 isNaN(parseInt(numberAnswer))
               }
               className="mx-auto flex bg-[hsl(280,100%,70%)] hover:bg-[hsl(280,100%,60%)]"
