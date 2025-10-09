@@ -214,6 +214,7 @@ export default function QuestionCard({
                   value={numberAnswer}
                   onChange={handleInputChange}
                   disabled={isSubmitted}
+                  inputMode="numeric"
                   placeholder="?"
                   className="relative h-28 w-full rounded-2xl border-2 border-purple-500/30 bg-gradient-to-br from-purple-50/50 to-violet-50/50 text-center text-6xl font-black tracking-tight shadow-lg transition-all focus:scale-105 focus:border-purple-500 focus:shadow-purple-500/20 disabled:opacity-50 md:h-32 md:text-7xl dark:from-purple-950/30 dark:to-violet-950/30"
                   min="0"
