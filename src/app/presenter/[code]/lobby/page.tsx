@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Gamepad2 } from "lucide-react";
+import QRCode from "@/app/_components/displayQRCode";
 
 interface GameSettingsState {
   timePerQuestion: number;
@@ -47,9 +48,10 @@ export default function LobbyPage() {
             Share the code below with players to join
           </p>
         </div>
-
-        <GameCode />
-
+        <div className="flex items-center">
+          <GameCode />
+          <QRCode />
+        </div>
         <div className="grid w-full max-w-4xl gap-6 md:grid-cols-2">
           <div className="flex flex-col gap-6">
             <Card>
