@@ -157,6 +157,4 @@ export default function GamePage() {
       </div>
     );
   }
-
-  return <div>Loading...</div>;
 }

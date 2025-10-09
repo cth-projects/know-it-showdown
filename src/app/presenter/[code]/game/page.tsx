@@ -10,6 +10,7 @@ import { usePusherContext } from "@/contexts/PusherContext";
 import type { PlayerResult, PlayerStatus, PresenterGameEvent } from "@/types";
 import QuestionResult from "@/app/_components/questionResult";
 import { Game0To100State } from "@prisma/client";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function GamePage() {
   const param = useParams();
@@ -122,11 +123,8 @@ export default function GamePage() {
 
   if (!isClient) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="space-y-4 text-center">
-          <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
-          <p className="text-xl font-semibold text-gray-600">Loading page...</p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center">
+        <Spinner className="size-10" />
       </div>
     );
   }

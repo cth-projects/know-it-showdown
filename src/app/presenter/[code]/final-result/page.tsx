@@ -1,7 +1,9 @@
 "use client";
 
 import ResultPodium from "@/app/_components/ResultPodium";
+import { Spinner } from "@/components/ui/spinner";
 import { api } from "@/trpc/react";
+import { Game0To100State } from "@prisma/client";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
 
@@ -24,28 +26,14 @@ export default function FinalResult() {
     void fetchData();
   }, [refetch]);
 
-  if (isLoading || !finalResultEvent) {
+  if (
+    isLoading ||
+    !finalResultEvent ||
+    finalResultEvent.newState !== Game0To100State.FINAL_RESULT
+  ) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="space-y-4 text-center">
-          <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
-          <p className="text-xl font-semibold text-gray-600">
-            Loading results...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (finalResultEvent.newState !== "FINAL_RESULT") {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="space-y-4 text-center">
-          <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
-          <p className="text-xl font-semibold text-gray-600">
-            Loading results...
-          </p>
-        </div>
+        <Spinner className="size-10" />
       </div>
     );
   }
