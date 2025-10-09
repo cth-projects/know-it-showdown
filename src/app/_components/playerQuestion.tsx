@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -14,8 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { QuestionEvent } from "@/types";
-import CountdownTimer from "./countdownTimer";
 import { CheckCircle2, Clock, Sparkles, Users, Zap } from "lucide-react";
+import PlayerCountdownTimer from "./playerCountdownTimer";
 
 interface QuestionCardProps {
   question: QuestionEvent["currentQuestion"];
@@ -36,10 +36,17 @@ export default function QuestionCard({
   isSubmitted = false,
   playerAnswer,
 }: QuestionCardProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const [numberAnswer, setNumberAnswer] = useState<string>("");
 
   useEffect(() => {
     setNumberAnswer("");
+
+    setTimeout(() => {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }, 100);
   }, [question]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -176,7 +183,7 @@ export default function QuestionCard({
                   {questionIndex + 1}/{totalQuestions}
                 </span>
               </div>
-              <CountdownTimer targetTimestamp={questionEndTimestamp} />
+              <PlayerCountdownTimer targetTimestamp={questionEndTimestamp} />
             </div>
 
             <CardTitle className="text-2xl leading-tight font-black tracking-tight text-balance md:text-3xl lg:text-4xl">
@@ -202,6 +209,7 @@ export default function QuestionCard({
               <div className="relative">
                 <div className="absolute -inset-1 animate-pulse rounded-2xl bg-gradient-to-r from-purple-500/20 via-violet-500/20 to-fuchsia-500/20 blur-lg" />
                 <Input
+                  ref={inputRef}
                   type="number"
                   value={numberAnswer}
                   onChange={handleInputChange}
