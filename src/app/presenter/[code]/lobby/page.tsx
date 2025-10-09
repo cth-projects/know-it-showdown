@@ -13,7 +13,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Gamepad2 } from "lucide-react";
-import QRCode from "@/app/_components/displayQRCode";
+import QRCodeGenerator from "@/app/_components/qrCodeGenerator";
+import { useParams } from "next/navigation";
 import { audioManager } from "@/lib/audioManager";
 
 interface GameSettingsState {
@@ -43,6 +44,13 @@ export default function LobbyPage() {
   }, []);
   const [gameSettings, setGameSettings] =
     useState<GameSettingsState>(DEFAULT_SETTINGS);
+  const param = useParams();
+  const code = param.code as string;
+  const [URL, setURL] = useState("");
+
+  useEffect(() => {
+    setURL(`${window.location.origin}/join/${code}`);
+  }, [code]);
 
   const handleSettingsChange = (newSettings: GameSettingsState) => {
     setGameSettings(newSettings);
@@ -62,15 +70,11 @@ export default function LobbyPage() {
             Share the code below with players to join
           </p>
         </div>
-        <div className="flex items-center">
-          <GameCode />
-          <QRCode />
-        </div>
-        <div className="grid w-full max-w-4xl gap-6 md:grid-cols-2">
+        <div className="grid w-full max-w-4xl gap-6 md:grid-cols-3">
           <div className="flex flex-col gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Game Settings</CardTitle>
+                <CardTitle className="flex flex-col items-center">Game Settings</CardTitle>
                 <CardDescription>
                   Configure your game before starting
                 </CardDescription>
@@ -84,6 +88,17 @@ export default function LobbyPage() {
             </Card>
 
             <StartButton gameSettings={gameSettings} />
+          </div>
+          <div className="flex flex-col items-center">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex flex-col items-center">Lobby Code</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col items-center">
+                <GameCode />
+                <QRCodeGenerator url={URL} />
+              </CardContent>
+            </Card>
           </div>
 
           <PlayerList />

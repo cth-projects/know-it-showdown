@@ -36,11 +36,6 @@ export function GameSettings({ value, onChange }: GameSettingsProps) {
 
   return (
     <div className="border-border/40 bg-card/15 flex w-full max-w-sm flex-col items-center gap-3 rounded-lg border p-5 shadow-sm backdrop-blur-sm">
-      {/* Header */}
-      <div className="w-full text-center">
-        <h3 className="text-sm font-semibold tracking-tight">Game Settings</h3>
-      </div>
-
       {/* Time per Question Section */}
       <div className="w-full space-y-2.5">
         <Label className="text-muted-foreground block text-center text-xs font-medium tracking-wide uppercase">

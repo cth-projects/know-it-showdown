@@ -11,15 +11,15 @@ export default function Gamecode() {
   const [copy, isCopied] = useCopyToClipboard();
 
   return (
-    <div>
+   
       <Button
         variant="outline"
-        className="mb-5 h-9 gap-2 text-sm"
+        className="mb-5 h-9 gap-2 text-lg w-full"
         onClick={() => copy(code)}
       >
         {code}
         {isCopied ? <ClipboardCheckIcon /> : <ClipboardIcon />}
       </Button>
-    </div>
+  
   );
 }

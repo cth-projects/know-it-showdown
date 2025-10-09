@@ -19,6 +19,7 @@ export default function StartButton({ gameSettings }: StartButtonProps) {
 
   return (
     <Button
+      className="bg-lime-700 hover:bg-lime-800"
       variant={"secondary"}
       onClick={async () => {
         await mutation.mutateAsync({
