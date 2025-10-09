@@ -43,9 +43,9 @@ const getInitial = (name: string): string => {
 };
 
 const sizeClasses = {
-  sm: { avatar: "h-10 w-10", text: "text-sm", label: "text-xs" },
-  md: { avatar: "h-16 w-16", text: "text-xl", label: "text-sm" },
-  lg: { avatar: "h-24 w-24", text: "text-3xl", label: "text-base" },
+  sm: { avatar: "h-10 w-10", text: "text-sm", label: "text-sm" },
+  md: { avatar: "h-16 w-16", text: "text-xl", label: "text-base" },
+  lg: { avatar: "h-24 w-24", text: "text-3xl", label: "text-lg" },
 };
 
 export default function PlayerAvatar({
