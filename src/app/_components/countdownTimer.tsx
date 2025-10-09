@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+"use client";
+
+import type React from "react";
+import { useState, useEffect } from "react";
+import { Clock, Zap } from "lucide-react";
+
 interface CountdownTimerProps {
   targetTimestamp: string;
   onComplete?: () => void;
@@ -45,11 +48,12 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
     return `${seconds.toString()}`;
   };
 
-  const getTimerColor = () => {
-    if (!isActive) return "text-red-600";
-    if (timeLeft <= 5) return "text-red-500";
-    if (timeLeft <= 10) return "text-orange-500";
-    return "text-foreground";
+  const getTimerGradient = () => {
+    if (!isActive) return "from-red-500 to-red-600";
+    if (timeLeft <= 5) return "from-red-500 via-orange-500 to-red-600";
+    if (timeLeft <= 10) return "from-orange-500 via-amber-500 to-orange-600";
+    if (timeLeft <= 15) return "from-amber-500 via-yellow-500 to-amber-600";
+    return "from-purple-500 via-violet-500 to-purple-600";
   };
 
   const getTimerAnimation = () => {
@@ -60,37 +64,80 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
     return "";
   };
 
-  const getCardAnimation = () => {
-    if (!isActive) return "bg-purple-500/30 shadow-xl shadow-purple-500/50";
+  const getRingAnimation = () => {
+    if (!isActive) return "animate-critical-glow";
     if (timeLeft <= 5) return "animate-critical-glow";
     if (timeLeft <= 10) return "animate-urgent-glow";
     if (timeLeft <= 15) return "animate-warning-glow";
     return "";
   };
 
+  const getIconColor = () => {
+    if (!isActive) return "text-red-400";
+    if (timeLeft <= 5) return "text-red-400";
+    if (timeLeft <= 10) return "text-orange-400";
+    if (timeLeft <= 15) return "text-amber-400";
+    return "text-purple-400";
+  };
+
+  const totalTime = Math.max(
+    0,
+    Math.ceil((new Date(targetTimestamp).getTime() - Date.now()) / 1000),
+  );
+  const progressPercentage = Math.min((timeLeft / totalTime) * 100, 100);
+
   return (
-    <Card className="mx-auto w-fit border-0 bg-transparent p-2">
-      <CardContent className={`p-4 ${getCardAnimation()}`}>
-        <div className="text-center">
-          <div className="flex items-center justify-center space-x-2">
-            {!isActive ? (
-              <div className="animate-times-up-clean font-mono text-7xl tracking-wider text-white uppercase">
-                TIME&apos;S UP
-              </div>
-            ) : (
-              <Badge
-                variant="outline"
-                className="font-bold} w-[5ch] border-white/5 bg-white/1 p-2 font-mono text-8xl"
-              >
-                <div className={` ${getTimerAnimation()} ${getTimerColor()}`}>
-                  {formatTime(timeLeft)}
-                </div>
-              </Badge>
-            )}
-          </div>
+    <div className="relative flex items-center justify-center">
+      <div
+        className={`relative flex items-center gap-3 rounded-2xl border-2 border-white/20 bg-gradient-to-br ${getTimerGradient()} p-4 shadow-2xl backdrop-blur-sm transition-all duration-300 ${getRingAnimation()} ${getTimerAnimation()}`}
+      >
+        <div className={`${getIconColor()} transition-colors duration-300`}>
+          {!isActive ? (
+            <Zap className="h-8 w-8 animate-pulse" />
+          ) : (
+            <Clock className="h-8 w-8" />
+          )}
         </div>
-      </CardContent>
-    </Card>
+
+        <div className="flex flex-col items-center justify-center">
+          {!isActive ? (
+            <div className="animate-times-up-clean font-mono text-2xl font-bold tracking-wider text-white uppercase md:text-3xl">
+              Time&apos;s Up!
+            </div>
+          ) : (
+            <>
+              <div className="font-mono text-5xl font-black text-white tabular-nums drop-shadow-lg md:text-6xl">
+                {formatTime(timeLeft)}
+              </div>
+              <div className="text-xs font-semibold tracking-widest text-white/80 uppercase">
+                seconds
+              </div>
+            </>
+          )}
+        </div>
+
+        {isActive && (
+          <div className="absolute inset-0 overflow-hidden rounded-2xl">
+            <div
+              className="absolute right-0 bottom-0 left-0 bg-white/10 transition-all duration-300 ease-linear"
+              style={{ height: `${progressPercentage}%` }}
+            />
+          </div>
+        )}
+
+        {isActive && timeLeft > 5 && (
+          <div className="absolute inset-0 overflow-hidden rounded-2xl">
+            <div className="animate-shimmer absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+          </div>
+        )}
+      </div>
+
+      {timeLeft <= 10 && isActive && (
+        <div
+          className={`absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br ${getTimerGradient()} opacity-50 blur-xl`}
+        />
+      )}
+    </div>
   );
 };
 
