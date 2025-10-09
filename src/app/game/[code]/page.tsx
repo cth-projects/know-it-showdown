@@ -8,6 +8,7 @@ import Lobby from "@/components/game/lobby";
 import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
 import { Game0To100State } from "@prisma/client";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function GamePage() {
   const params = useParams();
@@ -25,6 +26,53 @@ export default function GamePage() {
   const router = useRouter();
   const submitAnswerMutation = api.game.submitAnswer.useMutation();
   const { subscribe, unsubscribe } = usePusherContext();
+
+  const [isInitialized, setIsInitialized] = useState(false);
+  const { data: currentState, isLoading } =
+    api.game.getCurrentPlayerView.useQuery(
+      {
+        gameCode: code,
+        playerName: playerName ?? "",
+      },
+      {
+        enabled: !!playerName && !!code,
+        refetchOnWindowFocus: false,
+      },
+    );
+
+  useEffect(() => {
+    if (currentState && !isInitialized) {
+      setGameState(currentState.newState);
+
+      if (currentState.newState === Game0To100State.QUESTION) {
+        setQuestionData(currentState);
+        setHasSubmitted(currentState.hasAnswered);
+        setSubmittedAnswer(currentState.submittedAnswer);
+      } else if (currentState.newState === Game0To100State.RESULT) {
+        const resultEvent = currentState;
+
+        setQuestionData({
+          newState: "QUESTION",
+          currentQuestion: {
+            question: resultEvent.questionResult.question,
+            category: resultEvent.questionResult.category,
+          },
+          currentQuestionIndex: resultEvent.currentQuestionIndex,
+          totalQuestions: resultEvent.totalQuestions,
+          nextAdvanceTimestamp: resultEvent.nextAdvanceTimestamp,
+        });
+
+        const playerResult = resultEvent.playerResults.find(
+          (p) => p.name === playerName,
+        );
+
+        setHasSubmitted(true);
+        setSubmittedAnswer(playerResult?.answer);
+      }
+
+      setIsInitialized(true);
+    }
+  }, [currentState, isInitialized, playerName]);
 
   useEffect(() => {
     const channelName = "player-" + code;
@@ -67,9 +115,21 @@ export default function GamePage() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Spinner className="size-10" />
+      </div>
+    );
+  }
+
   if (gameState === Game0To100State.LOBBY) {
     return <Lobby gameCode={code} playerName={playerName} />;
-  } else if (gameState === Game0To100State.QUESTION && questionData) {
+  } else if (
+    (gameState === Game0To100State.QUESTION ||
+      gameState === Game0To100State.RESULT) &&
+    questionData
+  ) {
     return (
       <QuestionCard
         question={questionData.currentQuestion}
@@ -81,10 +141,6 @@ export default function GamePage() {
         totalQuestions={questionData.totalQuestions}
       />
     );
-  } else if (gameState === Game0To100State.RESULT) {
-    <div className="flex h-screen w-full flex-col items-center justify-center space-y-6">
-      Waiting for next question!
-    </div>;
   } else if (gameState === Game0To100State.FINAL_RESULT) {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center space-y-6">

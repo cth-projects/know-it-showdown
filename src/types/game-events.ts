@@ -61,3 +61,14 @@ export interface PlayerStatus {
   name: string;
   answered: boolean;
 }
+
+export interface PlayerQuestionEvent extends QuestionEvent {
+  hasAnswered: boolean;
+  submittedAnswer?: number;
+}
+
+export type PlayerViewResponse =
+  | PlayerQuestionEvent
+  | ResultEvent
+  | FinalResultEvent
+  | null; // null for LOBBY state

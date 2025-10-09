@@ -14,7 +14,11 @@ import {
   getRandomQuestions,
   handleGameBroadcasting,
 } from "@/lib/game";
-import type { PlayerStatus, PresenterGameEvent } from "src/types";
+import type {
+  PlayerStatus,
+  PlayerViewResponse,
+  PresenterGameEvent,
+} from "src/types";
 
 export const gameRouter = createTRPCRouter({
   createGame: publicProcedure
@@ -361,6 +365,66 @@ export const gameRouter = createTRPCRouter({
       }
 
       return playerStatusList;
+    }),
+
+  getCurrentPlayerView: publicProcedure
+    .input(
+      z.object({
+        gameCode: z.string().length(6),
+        playerName: z.string().min(1),
+      }),
+    )
+    .query(async ({ ctx, input }): Promise<PlayerViewResponse> => {
+      const game = await ctx.db.game0To100.findUnique({
+        where: { gameCode: input.gameCode },
+        include: {
+          players: {
+            where: { name: input.playerName },
+          },
+          questions: {
+            include: {
+              category: true,
+            },
+          },
+        },
+      });
+
+      if (!game) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Game not found" });
+      }
+
+      if (game.players.length === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Player not found in game",
+        });
+      }
+
+      const player = game.players[0]!;
+
+      if (game.gameState === Game0To100State.LOBBY) {
+        return null;
+      }
+
+      if (game.gameState === Game0To100State.QUESTION) {
+        const questionEvent = buildQuestionEvent(game);
+        const hasAnswered =
+          player.playerAnswers.length > game.currentQuestionIndex;
+
+        return {
+          ...questionEvent,
+          hasAnswered,
+          submittedAnswer: hasAnswered
+            ? player.playerAnswers[game.currentQuestionIndex]
+            : undefined,
+        };
+      }
+
+      if (game.gameState === Game0To100State.RESULT) {
+        return buildResultEvent(game);
+      }
+
+      return buildFinalResultEvent(game);
     }),
 
   submitAnswer: publicProcedure
