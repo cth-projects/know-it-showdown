@@ -16,7 +16,11 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
   const [timeLeft, setTimeLeft] = useState(0);
   const [isActive, setIsActive] = useState(true);
 
+  const [progressPercentage, setProgressPercentage] = useState(0);
+
   useEffect(() => {
+    const initialTime = Date.now();
+
     const calculateTimeLeft = () => {
       const now = Date.now();
       const target = new Date(targetTimestamp).getTime();
@@ -28,8 +32,32 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
     setIsActive(true);
 
     const intervalId = setInterval(() => {
+      const currentTime = Date.now();
+
       const remaining = calculateTimeLeft();
       setTimeLeft(remaining);
+
+      const totalDurationInSeconds = Math.max(
+        0,
+        Math.ceil((new Date(targetTimestamp).getTime() - initialTime) / 1000),
+      );
+
+      const elapsedTimeInSeconds = Math.max(
+        0,
+        Math.floor((currentTime - initialTime) / 1000),
+      );
+
+      let perc = 0;
+      if (totalDurationInSeconds > 0) {
+        perc = Math.min(
+          (elapsedTimeInSeconds / totalDurationInSeconds) * 100,
+          100,
+        );
+      } else if (currentTime >= new Date(targetTimestamp).getTime()) {
+        perc = 100;
+      }
+
+      setProgressPercentage(perc);
 
       if (remaining <= 0) {
         setIsActive(false);
@@ -80,12 +108,6 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
     return "text-purple-400";
   };
 
-  const totalTime = Math.max(
-    0,
-    Math.ceil((new Date(targetTimestamp).getTime() - Date.now()) / 1000),
-  );
-  const progressPercentage = Math.min((timeLeft / totalTime) * 100, 100);
-
   return (
     <div className="relative flex items-center justify-center">
       <div
@@ -102,7 +124,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
         <div className="flex flex-col items-center justify-center">
           {!isActive ? (
             <div className="animate-times-up-clean font-mono text-2xl font-bold tracking-wider text-white uppercase md:text-3xl">
-              Time&apos;s Up!
+              0
             </div>
           ) : (
             <>

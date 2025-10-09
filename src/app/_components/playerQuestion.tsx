@@ -173,7 +173,7 @@ export default function QuestionCard({
               <div className="flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500/10 to-violet-500/10 px-4 py-2 ring-1 ring-purple-500/20">
                 <Sparkles className="h-4 w-4 text-purple-500" />
                 <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
-                  Question {questionIndex + 1} of {totalQuestions}
+                  {questionIndex + 1}/{totalQuestions}
                 </span>
               </div>
               <CountdownTimer targetTimestamp={questionEndTimestamp} />
