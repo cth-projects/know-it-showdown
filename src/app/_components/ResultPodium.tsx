@@ -5,6 +5,7 @@ import PlayerAvatar from "./playerAvatar";
 import type { FinalResultEvent } from "@/types";
 import FinalCountdownGrid from "./finalCountdownGrid";
 import FinalRankedList from "./finalRankedList";
+import { audioManager } from "@/lib/audioManager";
 
 type ResultPodiumProps = {
   finalResults: FinalResultEvent["finalResults"];
@@ -61,13 +62,12 @@ export default function ResultPodium({
 
   const handleCountdownComplete = useCallback(
     (playerName: string, rank: number) => {
-      console.log(`Player ${playerName} finished countdown with rank ${rank}`);
       setTimeout(() => {
         if (rank <= 3) {
-          console.log(`Adding ${playerName} to podium (rank ${rank})`);
           setPlayersInPodium((prev) => new Set([...prev, playerName]));
+          audioManager.play("winner");
+          audioManager.startLoop("winnerBackground", { volumeModifier: -0.5 });
         } else {
-          console.log(`Adding ${playerName} to list (rank ${rank})`);
           setPlayersInList((prev) => new Set([...prev, playerName]));
         }
       }, transitionDelay);

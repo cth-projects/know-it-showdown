@@ -118,6 +118,7 @@ export default function FinalCountdownGrid({
                     startFrom={10000}
                     size="md"
                     duration={duration}
+                    variant="final"
                     onCountdownComplete={() => {
                       onPlayerCountdownComplete(player.name, player.rank);
                     }}

@@ -110,7 +110,7 @@ export default function FinalRankedList({
               }}
               className="flex items-center justify-center"
             >
-              <span className="text-3xl font-bold text-white">
+              <span className="text-3xl font-bold text-amber-400">
                 {player.finalScore}
               </span>
             </motion.div>

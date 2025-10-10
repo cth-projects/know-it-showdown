@@ -3,6 +3,7 @@
 import ResultPodium from "@/app/_components/ResultPodium";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { audioManager } from "@/lib/audioManager";
 import { api } from "@/trpc/react";
 import { Game0To100State } from "@prisma/client";
 import { motion } from "motion/react";
@@ -33,19 +34,11 @@ export default function FinalResult() {
   }, [refetch]);
 
   useEffect(() => {
-    if (finalResultEvent?.newState === Game0To100State.FINAL_RESULT) {
-      const totalPlayers = finalResultEvent.finalResults.length;
+    return () => {
+      audioManager.stop("winnerBackground");
+    };
+  }, []);
 
-      const longestCountdown = (totalPlayers + 2) * baseCountdownDuration;
-      const totalAnimationTime = longestCountdown + transitionDelay;
-
-      const timer = setTimeout(() => {
-        setShowBackButton(true);
-      }, totalAnimationTime);
-
-      return () => clearTimeout(timer);
-    }
-  }, [finalResultEvent]);
   if (
     isLoading ||
     !finalResultEvent ||

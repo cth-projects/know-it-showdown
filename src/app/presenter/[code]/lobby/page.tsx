@@ -42,6 +42,7 @@ export default function LobbyPage() {
       audioManager.stop("testLoop");
     };
   }, []);
+
   const [gameSettings, setGameSettings] =
     useState<GameSettingsState>(DEFAULT_SETTINGS);
   const param = useParams();
@@ -74,7 +75,9 @@ export default function LobbyPage() {
           <div className="flex flex-col gap-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex flex-col items-center">Game Settings</CardTitle>
+                <CardTitle className="flex flex-col items-center">
+                  Game Settings
+                </CardTitle>
                 <CardDescription>
                   Configure your game before starting
                 </CardDescription>
@@ -92,7 +95,9 @@ export default function LobbyPage() {
           <div className="flex flex-col items-center">
             <Card>
               <CardHeader>
-                <CardTitle className="flex flex-col items-center">Lobby Code</CardTitle>
+                <CardTitle className="flex flex-col items-center">
+                  Lobby Code
+                </CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center">
                 <GameCode />
