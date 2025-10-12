@@ -9,18 +9,18 @@ type DisplayProps = {
 
 function Display({ question, result, showResult }: DisplayProps) {
   return (
-    <motion.div 
-      layout 
+    <motion.div
+      layout
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="flex flex-col items-center gap-8"
     >
       <AnimatePresence mode="wait">
         <motion.div
-          key={question} 
+          key={question}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="w-[80vw] text-5xl text-center"
+          className="w-[80vw] text-center text-5xl"
         >
           {question}
         </motion.div>
@@ -30,14 +30,16 @@ function Display({ question, result, showResult }: DisplayProps) {
           <motion.div
             initial={{ opacity: 0, scale: 0.5, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ 
-              type: "spring", 
+            transition={{
+              type: "spring",
               stiffness: 300,
               damping: 20,
             }}
-            className="text-5xl text-green-600"
+            className="rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 px-12 py-6 shadow-2xl"
           >
-            {result}
+            <div className="text-6xl font-extrabold text-white drop-shadow-lg">
+              {result}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
