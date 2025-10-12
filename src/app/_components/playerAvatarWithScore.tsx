@@ -77,7 +77,7 @@ export default function PlayerAvatarWithScore({
   const handleComplete = () => {
     setIsLocked(true);
     if (variant === "final") {
-      audioManager.play("scorePoints", { volumeModifier: -0.3 });
+      audioManager.play("score", { volumeModifier: -0.3 });
     }
     if (onCountdownComplete) {
       onCountdownComplete();

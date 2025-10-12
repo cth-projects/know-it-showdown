@@ -2,7 +2,8 @@ import type { PlayerResult } from "@/types";
 import { AnimatePresence } from "motion/react";
 import ResultCountdownGrid from "./resultCountdownGrid";
 import ResultRankedList from "./resultRankedList";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { audioManager } from "@/lib/audioManager";
 
 type QuestionResultProps = {
   playerResults: PlayerResult[];
@@ -12,8 +13,8 @@ type QuestionResultProps = {
 
 export default function QuestionResult({
   playerResults,
-  countdownDuration = 800,
-  transitionDelay = 400,
+  countdownDuration = 3000,
+  transitionDelay = 1500,
 }: QuestionResultProps) {
   const [showVerticalLayout, setShowVerticalLayout] = useState(false);
 
@@ -22,10 +23,19 @@ export default function QuestionResult({
   );
 
   const handleCountdownComplete = () => {
+    audioManager.stop("countdown");
     setTimeout(() => {
       setShowVerticalLayout(true);
     }, transitionDelay);
   };
+
+  useEffect(() => {
+    audioManager.startLoop("countdown", { volumeModifier: -0.3 });
+
+    return () => {
+      audioManager.stop("countdown");
+    };
+  }, []);
 
   if (sortedResults.length === 0) {
     return (

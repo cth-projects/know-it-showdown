@@ -5,19 +5,20 @@ export const AUDIO_PATHS = {
   winner: "/sounds/winner.mp3",
   winnerBackground: "/sounds/small-cheer.mp3",
 
-  // player score countdown complete audio
-  scoreBeep: "/sounds/score/arcade-beep.mp3",
-  scorePoints: "/sounds/score/points.mp3",
+  countdown: "/sounds/countdown.mp3",
+
+  drumRoll: "/sounds/drum-roll.mp3",
+  score: "/sounds/points.mp3",
 } as const;
 
 export type AudioKey = keyof typeof AUDIO_PATHS;
 
 // Sound effects played ONCE (fire and forget) audioManager.play()
-export type SoundEffectKey =
-  | "testPlayOnce"
-  | "scoreBeep"
-  | "scorePoints"
-  | "winner";
+export type SoundEffectKey = "testPlayOnce" | "score" | "winner";
 
 // Looped sound effects, audioManager.startloop() / stop() / pause()
-export type ControlledSoundKey = "testLoop" | "winnerBackground";
+export type ControlledSoundKey =
+  | "testLoop"
+  | "winnerBackground"
+  | "drumRoll"
+  | "countdown";

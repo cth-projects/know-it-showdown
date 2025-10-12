@@ -1,6 +1,7 @@
+import { audioManager } from "@/lib/audioManager";
 import PlayerAvatarWithScore from "./playerAvatarWithScore";
 import { motion } from "motion/react";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 const MAX_PLAYERS_PER_ROW = 7;
 
@@ -27,6 +28,14 @@ export default function FinalCountdownGrid({
     playersPerRow: number;
     playerPositions: Map<string, { row: number; position: number }>;
   } | null>(null);
+
+  useEffect(() => {
+    audioManager.startLoop("drumRoll");
+
+    return () => {
+      audioManager.stop("drumRoll");
+    };
+  }, []);
 
   if (initialLayout.current === null) {
     const totalPlayers = players.length;
