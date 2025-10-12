@@ -14,13 +14,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 import { api } from "@/trpc/react";
 
@@ -33,7 +26,8 @@ export default function Join() {
 
   const [code, setCode] = useState("");
   const [playerName, setPlayerName] = useState("");
-  const [gameType, setGameType] = useState<GameType>(GameType.ZERO_TO_HUNDRED);
+  // Keep gameType logic for future expansion
+  const gameType = GameType.ZERO_TO_HUNDRED;
 
   const createGameMutation = api.game.createGame.useMutation({
     onSuccess: (data) => {
@@ -50,6 +44,12 @@ export default function Join() {
       }
     },
   });
+
+  const handleCreateGame = () => {
+    createGameMutation.mutate({
+      gameType,
+    });
+  };
 
   return (
     <Fragment>
@@ -101,49 +101,13 @@ export default function Join() {
           </DialogContent>
         </Dialog>
 
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline">Create Game</Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Create a new game</DialogTitle>
-              <DialogDescription>
-                Enter details to set up your game.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <label htmlFor="gameType">Game Type</label>
-                <Select
-                  onValueChange={(value) => setGameType(value as GameType)}
-                  defaultValue={GameType.ZERO_TO_HUNDRED}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Game" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={GameType.ZERO_TO_HUNDRED}>
-                      {GameType.ZERO_TO_HUNDRED}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                disabled={createGameMutation.isPending}
-                onClick={() => {
-                  createGameMutation.mutate({
-                    gameType,
-                  });
-                }}
-              >
-                {createGameMutation.isPending ? "Creating..." : "Create"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <Button
+          variant="outline"
+          disabled={createGameMutation.isPending}
+          onClick={handleCreateGame}
+        >
+          {createGameMutation.isPending ? "Creating..." : "Create Game"}
+        </Button>
       </div>
     </Fragment>
   );
