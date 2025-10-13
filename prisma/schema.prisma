@@ -21,16 +21,6 @@ model Game {
   @@index([upstashId])
 }
 
-// Example
-model Post {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([name])
-}
-
 // Game 0-100 models *******************************************************************
 enum Game0To100State {
   LOBBY
@@ -68,11 +58,11 @@ model Game0To100 {
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt
 
-  game      Game                 @relation(fields: [gameCode], references: [gameCode], onDelete: Cascade)
-  players   Game0To100Player[]
-  questions Game0To100Question[]
+  game                Game                 @relation(fields: [gameCode], references: [gameCode], onDelete: Cascade)
+  players             Game0To100Player[]
+  questions           Game0To100Question[]
   startRoundTimeStamp DateTime[]
-  endRoundTimeStamp DateTime[]
+  endRoundTimeStamp   DateTime[]
 }
 
 model Game0To100Player {
