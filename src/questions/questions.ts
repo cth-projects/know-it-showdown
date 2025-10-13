@@ -1,6 +1,7 @@
 import { Game0To100CategoryType } from "@prisma/client";
 
-export const sampleQuestions = [
+export const questions = [
+  // Kevin L's questions -----------------
   {
     question:
       "How many years of life expectancy did humans gain globally between 1950 and 2020?",
@@ -145,4 +146,6 @@ export const sampleQuestions = [
     categoryName: Game0To100CategoryType.POVERTY,
     // source: https://www.worldbank.org/en/topic/poverty/overview
   },
+  // ***************************************************************
+  // Someone else's questions ----------------------------
 ];
