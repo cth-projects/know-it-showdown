@@ -1,8 +1,7 @@
-"use client";
-
-import type React from "react";
-import { useState, useEffect } from "react";
-import { Clock, Zap } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { audioManager } from "@/lib/audioManager";
 
 interface CountdownTimerProps {
   targetTimestamp: string;
@@ -15,12 +14,9 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
 }) => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [isActive, setIsActive] = useState(true);
-
-  const [progressPercentage, setProgressPercentage] = useState(0);
+  const prevTimeLeftRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const initialTime = Date.now();
-
     const calculateTimeLeft = () => {
       const now = Date.now();
       const target = new Date(targetTimestamp).getTime();
@@ -28,36 +24,21 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
       return difference;
     };
 
-    setTimeLeft(calculateTimeLeft());
+    const initial = calculateTimeLeft();
+    setTimeLeft(initial);
     setIsActive(true);
 
     const intervalId = setInterval(() => {
-      const currentTime = Date.now();
-
       const remaining = calculateTimeLeft();
+      const prevTime = prevTimeLeftRef.current;
       setTimeLeft(remaining);
 
-      const totalDurationInSeconds = Math.max(
-        0,
-        Math.ceil((new Date(targetTimestamp).getTime() - initialTime) / 1000),
-      );
-
-      const elapsedTimeInSeconds = Math.max(
-        0,
-        Math.floor((currentTime - initialTime) / 1000),
-      );
-
-      let perc = 0;
-      if (totalDurationInSeconds > 0) {
-        perc = Math.min(
-          (elapsedTimeInSeconds / totalDurationInSeconds) * 100,
-          100,
-        );
-      } else if (currentTime >= new Date(targetTimestamp).getTime()) {
-        perc = 100;
+      if (prevTime === 11 && remaining === 10) {
+        audioManager.startLoop("timerAlarm", { volumeModifier: -0.3 });
       }
 
-      setProgressPercentage(perc);
+      // Update ref for next comparison
+      prevTimeLeftRef.current = remaining;
 
       if (remaining <= 0) {
         setIsActive(false);
@@ -67,9 +48,12 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
           onComplete();
         }
       }
-    }, 50);
+    }, 100);
 
-    return () => clearInterval(intervalId);
+    return () => {
+      clearInterval(intervalId);
+      audioManager.stop("timerAlarm");
+    };
   }, [targetTimestamp, onComplete]);
 
   const formatTime = (seconds: number) => {
@@ -77,89 +61,108 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
   };
 
   const getTimerGradient = () => {
-    if (!isActive) return "from-red-500 to-red-600";
-    if (timeLeft <= 5) return "from-red-500 via-orange-500 to-red-600";
-    if (timeLeft <= 10) return "from-orange-500 via-amber-500 to-orange-600";
-    if (timeLeft <= 15) return "from-amber-500 via-yellow-500 to-amber-600";
-    return "from-purple-500 via-violet-500 to-purple-600";
+    if (timeLeft <= 5) return "text-red-500";
+    if (timeLeft <= 10) return "text-orange-500";
+    return "text-white-400";
   };
 
-  const getTimerAnimation = () => {
-    if (!isActive) return "";
-    if (timeLeft <= 5) return "animate-critical-pulsate";
-    if (timeLeft <= 10) return "animate-urgent-pulsate";
-    if (timeLeft <= 15) return "animate-warning-pulsate";
-    return "";
-  };
-
-  const getRingAnimation = () => {
-    if (!isActive) return "animate-critical-glow";
-    if (timeLeft <= 5) return "animate-critical-glow";
-    if (timeLeft <= 10) return "animate-urgent-glow";
-    if (timeLeft <= 15) return "animate-warning-glow";
-    return "";
-  };
-
-  const getIconColor = () => {
-    if (!isActive) return "text-red-400";
-    if (timeLeft <= 5) return "text-red-400";
-    if (timeLeft <= 10) return "text-orange-400";
-    if (timeLeft <= 15) return "text-amber-400";
-    return "text-purple-400";
+  // Animation variants
+  const numberVariants: Variants = {
+    initial: { scale: 1.2, opacity: 0, y: -20 },
+    animate: { scale: 1, opacity: 1, y: 0 },
+    exit: { scale: 0.8, opacity: 0, y: 20 },
   };
 
   return (
-    <div className="relative flex items-center justify-center">
-      <div
-        className={`relative flex items-center gap-3 rounded-2xl border-2 border-white/20 bg-gradient-to-br ${getTimerGradient()} p-4 shadow-2xl backdrop-blur-sm transition-all duration-300 ${getRingAnimation()} ${getTimerAnimation()}`}
-      >
-        <div className={`${getIconColor()} transition-colors duration-300`}>
-          {!isActive ? (
-            <Zap className="h-8 w-8 animate-pulse" />
-          ) : (
-            <Clock className="h-8 w-8" />
-          )}
-        </div>
-
-        <div className="flex flex-col items-center justify-center">
-          {!isActive ? (
-            <div className="animate-times-up-clean font-mono text-2xl font-bold tracking-wider text-white uppercase md:text-3xl">
-              0
-            </div>
-          ) : (
-            <>
-              <div className="font-mono text-5xl font-black text-white tabular-nums drop-shadow-lg md:text-6xl">
-                {formatTime(timeLeft)}
-              </div>
-              <div className="text-xs font-semibold tracking-widest text-white/80 uppercase">
-                seconds
-              </div>
-            </>
-          )}
-        </div>
-
-        {isActive && (
-          <div className="absolute inset-0 overflow-hidden rounded-2xl">
-            <div
-              className="absolute right-0 bottom-0 left-0 bg-white/10 transition-all duration-300 ease-linear"
-              style={{ height: `${progressPercentage}%` }}
+    <Card className="mx-auto w-fit border-0 bg-transparent shadow-none">
+      <CardContent className="p-2">
+        {!isActive ? null : (
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{
+              scale: 1,
+              opacity: 1,
+              y: [0, -4, 0],
+            }}
+            transition={{
+              scale: { duration: 0.3 },
+              opacity: { duration: 0.3 },
+              y: {
+                duration: 2.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              },
+            }}
+            className="relative"
+          >
+            <motion.div
+              className="absolute inset-0 -z-10 rounded-full blur-2xl"
+              animate={{
+                scale:
+                  timeLeft <= 5
+                    ? [1, 1.15, 1]
+                    : timeLeft <= 10
+                      ? [1, 1.1, 1]
+                      : [1, 1.05, 1],
+                opacity:
+                  timeLeft <= 5
+                    ? [0.4, 0.7, 0.4]
+                    : timeLeft <= 10
+                      ? [0.3, 0.5, 0.3]
+                      : [0.2, 0.3, 0.2],
+              }}
+              transition={{
+                duration: timeLeft <= 5 ? 0.6 : timeLeft <= 10 ? 1.2 : 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              style={{
+                background:
+                  timeLeft <= 5
+                    ? "radial-gradient(circle, rgba(239, 68, 68, 0.5) 0%, transparent 60%)"
+                    : timeLeft <= 10
+                      ? "radial-gradient(circle, rgba(249, 115, 22, 0.4) 0%, transparent 60%)"
+                      : "radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, transparent 60%)",
+              }}
             />
-          </div>
-        )}
 
-        {isActive && timeLeft > 5 && (
-          <div className="absolute inset-0 overflow-hidden rounded-2xl">
-            <div className="animate-shimmer absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-          </div>
+            <div className="relative border-none bg-transparent p-0 font-mono text-7xl font-bold shadow-none sm:text-8xl md:text-9xl">
+              <div className="w-[2ch] border-none text-center">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={timeLeft}
+                    variants={numberVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    transition={{
+                      duration: 0.25,
+                      ease: "easeOut",
+                    }}
+                    className={`relative ${getTimerGradient()}`}
+                  >
+                    {/* The actual number with urgent shake */}
+                    <motion.span
+                      className="relative block font-bold"
+                      animate={{
+                        x: timeLeft <= 5 ? [0, -3, 3, -3, 3, 0] : 0,
+                      }}
+                      transition={{
+                        duration: 0.4,
+                        repeat: timeLeft <= 5 ? Infinity : 0,
+                        repeatDelay: 0.1,
+                      }}
+                    >
+                      {formatTime(timeLeft)}
+                    </motion.span>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </div>
+          </motion.div>
         )}
-      </div>
-
-      {timeLeft <= 10 && isActive && (
-        <div
-          className={`absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br ${getTimerGradient()} opacity-50 blur-xl`}
-        />
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

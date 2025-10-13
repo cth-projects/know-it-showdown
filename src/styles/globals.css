@@ -193,29 +193,29 @@
   }
 }
 
-/* URGENT GLOW: Gentle violet glow */
+/* URGENT GLOW: Gentle orange glow */
 @keyframes urgentGlow {
   0%,
   100% {
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.12);
-    background-color: rgba(139, 92, 246, 0.03);
+    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.12);
+    background-color: rgba(249, 115, 22, 0.03);
   }
   50% {
-    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.22);
-    background-color: rgba(139, 92, 246, 0.06);
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.22);
+    background-color: rgba(249, 115, 22, 0.06);
   }
 }
 
-/* CRITICAL GLOW: Clear but refined purple glow */
+/* CRITICAL GLOW: Intense red glow */
 @keyframes criticalGlow {
   0%,
   100% {
-    box-shadow: 0 6px 20px rgba(168, 85, 247, 0.18);
-    background-color: rgba(168, 85, 247, 0.05);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.18);
+    background-color: rgba(239, 68, 68, 0.05);
   }
   50% {
-    box-shadow: 0 8px 25px rgba(168, 85, 247, 0.3);
-    background-color: rgba(168, 85, 247, 0.1);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    background-color: rgba(239, 68, 68, 0.1);
   }
 }
 
@@ -239,14 +239,17 @@
 /* Glow animations - matching speeds */
 .animate-warning-glow {
   animation: warningGlow 2s ease-in-out infinite;
+  animation-fill-mode: backwards;
 }
 
 .animate-urgent-glow {
   animation: urgentGlow 1.2s ease-in-out infinite;
+  animation-fill-mode: backwards;
 }
 
 .animate-critical-glow {
   animation: criticalGlow 0.6s ease-in-out infinite;
+  animation-fill-mode: backwards;
 }
 
 /* Time's Up badge */

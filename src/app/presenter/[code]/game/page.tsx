@@ -107,7 +107,6 @@ export default function GamePage() {
 
   const handleAdvance = async () => {
     if (isMutating) return;
-
     setIsMutating(true);
     try {
       if (gameState === Game0To100State.QUESTION) {

@@ -11,6 +11,8 @@ export const AUDIO_PATHS = {
   score: "/sounds/points.mp3",
   applause: "/sounds/applause.mp3",
   swoosh: "/sounds/swoosh.mp3",
+
+  timerAlarm: "/sounds/emergency-alarm2.mp3",
 } as const;
 
 export type AudioKey = keyof typeof AUDIO_PATHS;
@@ -28,4 +30,5 @@ export type ControlledSoundKey =
   | "testLoop"
   | "winnerBackground"
   | "drumRoll"
-  | "countdown";
+  | "countdown"
+  | "timerAlarm";
