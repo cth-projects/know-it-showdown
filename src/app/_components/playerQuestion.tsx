@@ -34,7 +34,7 @@ export default function QuestionCard({
   questionEndTimestamp,
   onSubmitAnswer,
   isSubmitted = false,
-  playerAnswer,
+  playerAnswer = 0,
 }: QuestionCardProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -183,7 +183,7 @@ export default function QuestionCard({
                   {questionIndex + 1}/{totalQuestions}
                 </span>
               </div>
-              <PlayerCountdownTimer targetTimestamp={questionEndTimestamp} />
+              <PlayerCountdownTimer targetTimestamp={questionEndTimestamp} onComplete={() => handleSubmit()}/>
             </div>
 
             <CardTitle className="text-2xl leading-tight font-black tracking-tight text-balance md:text-3xl lg:text-4xl">

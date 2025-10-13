@@ -15,6 +15,7 @@ const PlayerCountdownTimer: React.FC<CountdownTimerProps> = ({
 }) => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [isActive, setIsActive] = useState(true);
+  const [hasCompleted, setHasCompleted] = useState(false);
 
   const [progressPercentage, setProgressPercentage] = useState(0);
 
@@ -63,14 +64,17 @@ const PlayerCountdownTimer: React.FC<CountdownTimerProps> = ({
         setIsActive(false);
         clearInterval(intervalId);
 
-        if (onComplete) {
+        if (onComplete && !hasCompleted) {
           onComplete();
+          setHasCompleted(true);
         }
+      } else {
+        setHasCompleted(false);
       }
     }, 50);
 
     return () => clearInterval(intervalId);
-  }, [targetTimestamp, onComplete]);
+  }, [targetTimestamp, onComplete, hasCompleted]);
 
   const formatTime = (seconds: number) => {
     if (seconds <= 0) return `00`;
