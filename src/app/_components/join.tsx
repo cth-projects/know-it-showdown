@@ -71,8 +71,11 @@ export default function Join() {
                 <Input
                   id="code"
                   value={code}
-                  onChange={(e) => setCode(e.currentTarget.value)}
+                  onChange={(e) => setCode(e.currentTarget.value.toUpperCase())}
                   placeholder="ABC123"
+                  style={{ textTransform: "uppercase" }}
+                  spellCheck={false}
+                  autoComplete="off"
                 />
               </div>
               <div className="grid gap-2">
