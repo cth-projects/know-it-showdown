@@ -153,6 +153,17 @@ export const gameRouter = createTRPCRouter({
         input.totalQuestions,
       );
 
+      const game = await ctx.db.game0To100.findUnique({
+        where: { gameCode: input.gameCode },
+      });
+
+      if (game?.gameState !== Game0To100State.LOBBY) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Game has already started!",
+        });
+      }
+
       const updatedGame = await ctx.db.game0To100.update({
         where: { gameCode: input.gameCode },
         data: {

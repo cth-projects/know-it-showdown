@@ -14,24 +14,27 @@ export default function StartButton({ gameSettings }: StartButtonProps) {
   const param = useParams();
   const code = param.code as string;
   const router = useRouter();
-  const mutation = api.game.startGame.useMutation();
+  const mutation = api.game.startGame.useMutation({
+    onSuccess: () => {
+      router.push("/presenter/" + code + "/game");
+    },
+  });
   const { timePerQuestion, questionCount } = gameSettings;
 
   return (
     <Button
       className="bg-lime-700 hover:bg-lime-800"
       variant={"secondary"}
+      disabled={mutation.isPending}
       onClick={async () => {
         await mutation.mutateAsync({
           gameCode: code,
           totalQuestions: questionCount,
           secondsPerQuestion: timePerQuestion,
         });
-
-        router.push("/presenter/" + code + "/game");
       }}
     >
-      Start game
+      {mutation.isPending ? "Starting.." : "Start game"}
     </Button>
   );
 }
