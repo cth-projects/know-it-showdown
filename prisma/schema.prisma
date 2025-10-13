@@ -71,6 +71,8 @@ model Game0To100 {
   game      Game                 @relation(fields: [gameCode], references: [gameCode], onDelete: Cascade)
   players   Game0To100Player[]
   questions Game0To100Question[]
+  startRoundTimeStamp DateTime[]
+  endRoundTimeStamp DateTime[]
 }
 
 model Game0To100Player {

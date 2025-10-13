@@ -4,10 +4,8 @@ import { Game0To100State, type Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { calculateScore } from "./scoring";
 import {
-  BUFFER_SECONDS,
   DEFAULT_ANSWER,
   DISPLAY_FINAL_RESULTS_SECONDS,
-  DISPLAY_RESULTS_SECONDS,
 } from "./constants";
 
 type GameWithRelations = Prisma.Game0To100GetPayload<{
@@ -22,13 +20,9 @@ type GameWithRelations = Prisma.Game0To100GetPayload<{
 function buildBaseEventData(game: GameWithRelations) {
   const nextAdvanceTimestamp =
     game.gameState === Game0To100State.QUESTION
-      ? new Date(
-          Date.now() + (game.secondsPerQuestion + BUFFER_SECONDS) * 1000,
-        ).toISOString()
+      ? game.endRoundTimeStamp[game.currentQuestionIndex]?.toISOString()
       : game.gameState === Game0To100State.RESULT
-        ? new Date(
-            Date.now() + (DISPLAY_RESULTS_SECONDS + BUFFER_SECONDS) * 1000,
-          ).toISOString()
+        ? game.startRoundTimeStamp[game.currentQuestionIndex]?.toISOString()
         : game.gameState === Game0To100State.FINAL_RESULT
           ? new Date(
               Date.now() + DISPLAY_FINAL_RESULTS_SECONDS * 1000,
@@ -43,7 +37,7 @@ function buildBaseEventData(game: GameWithRelations) {
   return {
     currentQuestionIndex: game.currentQuestionIndex,
     totalQuestions: game.questions.length,
-    nextAdvanceTimestamp,
+    nextAdvanceTimestamp: nextAdvanceTimestamp!,
   };
 }
 

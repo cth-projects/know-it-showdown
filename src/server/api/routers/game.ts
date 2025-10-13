@@ -7,10 +7,12 @@ import { Game0To100State, type Prisma } from "@prisma/client";
 import {
   applyDefaultAnswers,
   broadcastQuestionEvents,
+  BUFFER_SECONDS,
   buildFinalResultEvent,
   buildQuestionEvent,
   buildResultEvent,
   calculateScore,
+  DISPLAY_RESULTS_SECONDS,
   getRandomQuestions,
   handleGameBroadcasting,
 } from "@/lib/game";
@@ -164,6 +166,10 @@ export const gameRouter = createTRPCRouter({
         });
       }
 
+      const startTimeStamps: Date[] = []
+      const endTimeStamps = startTimeStamps;
+      endTimeStamps[0] = new Date(Date.now() + (input.secondsPerQuestion+BUFFER_SECONDS)*1000);
+
       const updatedGame = await ctx.db.game0To100.update({
         where: { gameCode: input.gameCode },
         data: {
@@ -172,6 +178,8 @@ export const gameRouter = createTRPCRouter({
           questions: {
             connect: finalQuestions,
           },
+          startRoundTimeStamp: startTimeStamps,
+          endRoundTimeStamp: endTimeStamps,
         },
         include: {
           players: true,
@@ -243,6 +251,9 @@ export const gameRouter = createTRPCRouter({
 
       if (game.gameState === Game0To100State.RESULT) {
         updateData.currentQuestionIndex = nextQuestionIndex;
+        updateData.endRoundTimeStamp = [...game.endRoundTimeStamp];
+        updateData.endRoundTimeStamp.push(new Date(Date.now() + (game.secondsPerQuestion+BUFFER_SECONDS)*1000));
+        
       }
 
       const updatedGame = await ctx.db.game0To100.update({
@@ -299,10 +310,19 @@ export const gameRouter = createTRPCRouter({
         currentQuestion,
       );
 
+      const startTimeStamps = game.startRoundTimeStamp;
+      if(game.currentQuestionIndex === 0){
+        startTimeStamps[0] = (new Date(Date.now() + (DISPLAY_RESULTS_SECONDS+BUFFER_SECONDS)*1000));
+      } else {
+        startTimeStamps.push(new Date(Date.now() + (DISPLAY_RESULTS_SECONDS+BUFFER_SECONDS)*1000));
+      }
+      
+
       const updatedGame = await ctx.db.game0To100.update({
         where: { gameCode },
         data: {
           gameState: Game0To100State.RESULT,
+          startRoundTimeStamp: startTimeStamps,
         },
         include: {
           players: true,
