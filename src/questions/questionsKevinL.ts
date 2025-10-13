@@ -86,14 +86,14 @@ export const sampleQuestions = [
   },
   {
     question:
-      "How many more hundreds of liters of water does it take to produce one kilogram of pork compared to chicken? (2010)",
+      "How many hundreds of liters of water more does it take to produce one kilogram of pork compared to chicken? (2010)",
     answer: 17,
     categoryName: Game0To100CategoryType.WATER,
     // source: https://waterfootprint.org/en/water-footprint/product-water-footprint/water-footprint-crop-and-animal-products/
   },
   {
     question:
-      "How many more thousands of liters of water does it take to produce one kilogram of beef compared to vegetables? (2010)",
+      "How many thousands of liters of water more does it take to produce one kilogram of beef compared to vegetables? (2010)",
     answer: 15,
     categoryName: Game0To100CategoryType.WATER,
     // source: https://waterfootprint.org/en/water-footprint/product-water-footprint/water-footprint-crop-and-animal-products/
