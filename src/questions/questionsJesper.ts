@@ -4,26 +4,26 @@ const questions = [
   {
     question: "In what year in the 1900s was the United Nations founded?",
     answer: 45,
-    categoryName: Game0To100CategoryType.DEFAULT,
+    categoryName: Game0To100CategoryType.EDUCATION,
     // Source: https://www.un.org/en/about-us/history-of-the-un
   },
   {
     question: "How many Sustainable Development Goals are there?",
     answer: 17,
-    categoryName: Game0To100CategoryType.DEFAULT,
+    categoryName: Game0To100CategoryType.EDUCATION,
     // Source: https://www.un.org/sustainabledevelopment/development-goals/
   },
   {
     question:
       "By what year in the 2000s does the UN aim to achieve the Sustainable Development Goals?",
     answer: 30,
-    categoryName: Game0To100CategoryType.DEFAULT,
+    categoryName: Game0To100CategoryType.EDUCATION,
     // Source: https://www.un.org/sustainabledevelopment/development-goals/
   },
   {
     question: "How many official languages does the United Nations have?",
     answer: 6,
-    categoryName: Game0To100CategoryType.DEFAULT,
+    categoryName: Game0To100CategoryType.EDUCATION,
     // Source: https://www.un.org/en/our-work/official-languages
   },
   {
