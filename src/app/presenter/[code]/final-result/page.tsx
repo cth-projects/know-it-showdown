@@ -1,5 +1,6 @@
 "use client";
 
+import { AudioSettings } from "@/app/_components/audioSettings";
 import ResultPodium from "@/app/_components/ResultPodium";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -82,6 +83,9 @@ export default function FinalResult() {
             </Button>
           </motion.div>
         )}
+      </div>
+      <div className="fixed right-4 bottom-4 z-50">
+        <AudioSettings />
       </div>
     </main>
   );

@@ -12,6 +12,7 @@ import QuestionResult from "@/app/_components/questionResult";
 import { Game0To100State } from "@prisma/client";
 import { Spinner } from "@/components/ui/spinner";
 import { audioManager } from "@/lib/audioManager";
+import { AudioSettings } from "@/app/_components/audioSettings";
 
 export default function GamePage() {
   const param = useParams();
@@ -163,6 +164,9 @@ export default function GamePage() {
           {timeIsUp ? "Next Question" : "Show answer"}
         </Button>
       )}
+      <div className="fixed right-4 bottom-4 z-50">
+        <AudioSettings />
+      </div>
     </main>
   );
 }

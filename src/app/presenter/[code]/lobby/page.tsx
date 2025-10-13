@@ -16,6 +16,7 @@ import { Gamepad2 } from "lucide-react";
 import QRCodeGenerator from "@/app/_components/qrCodeGenerator";
 import { useParams } from "next/navigation";
 import { audioManager } from "@/lib/audioManager";
+import { AudioSettings } from "@/app/_components/audioSettings";
 
 interface GameSettingsState {
   timePerQuestion: number;
@@ -108,6 +109,9 @@ export default function LobbyPage() {
 
           <PlayerList />
         </div>
+      </div>
+      <div className="fixed right-4 bottom-4 z-50">
+        <AudioSettings />
       </div>
     </main>
   );
