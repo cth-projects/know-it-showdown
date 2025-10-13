@@ -17,6 +17,7 @@ export default function QuestionResult({
   transitionDelay = 1500,
 }: QuestionResultProps) {
   const [showVerticalLayout, setShowVerticalLayout] = useState(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
 
   const sortedResults = [...playerResults].sort(
     (a, b) => b.scoreForQuestion - a.scoreForQuestion,
@@ -36,6 +37,13 @@ export default function QuestionResult({
       audioManager.stop("countdown");
     };
   }, []);
+
+  useEffect(()=>{
+    if(showVerticalLayout && !hasPlayed){
+      audioManager.play("applause");
+      setHasPlayed(true);
+    }
+  }, [showVerticalLayout, hasPlayed])
 
   if (sortedResults.length === 0) {
     return (

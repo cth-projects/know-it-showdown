@@ -9,12 +9,19 @@ export const AUDIO_PATHS = {
 
   drumRoll: "/sounds/drum-roll.mp3",
   score: "/sounds/points.mp3",
+  applause: "/sounds/applause.mp3",
+  swoosh: "/sounds/swoosh.mp3",
 } as const;
 
 export type AudioKey = keyof typeof AUDIO_PATHS;
 
 // Sound effects played ONCE (fire and forget) audioManager.play()
-export type SoundEffectKey = "testPlayOnce" | "score" | "winner";
+export type SoundEffectKey =
+  | "testPlayOnce"
+  | "score"
+  | "winner"
+  | "applause"
+  | "swoosh";
 
 // Looped sound effects, audioManager.startloop() / stop() / pause()
 export type ControlledSoundKey =

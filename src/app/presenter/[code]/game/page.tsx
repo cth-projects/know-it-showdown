@@ -11,6 +11,7 @@ import type { PlayerResult, PlayerStatus, PresenterGameEvent } from "@/types";
 import QuestionResult from "@/app/_components/questionResult";
 import { Game0To100State } from "@prisma/client";
 import { Spinner } from "@/components/ui/spinner";
+import { audioManager } from "@/lib/audioManager";
 
 export default function GamePage() {
   const param = useParams();
@@ -76,6 +77,7 @@ export default function GamePage() {
           player.name === data.name ? { ...player, answered: true } : player,
         ),
       );
+      audioManager.play("swoosh");
     },
     [setPlayerStatus],
   );
