@@ -7,6 +7,8 @@ export const AUDIO_PATHS = {
 
   countdown: "/sounds/countdown.mp3",
 
+  questionSound: "/sounds/questionSound.mp3",
+
   drumRoll: "/sounds/drum-roll.mp3",
   score: "/sounds/points.mp3",
   applause: "/sounds/applause.mp3",
@@ -31,4 +33,5 @@ export type ControlledSoundKey =
   | "winnerBackground"
   | "drumRoll"
   | "countdown"
-  | "timerAlarm";
+  | "timerAlarm"
+  | "questionSound";

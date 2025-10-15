@@ -106,6 +106,20 @@ export default function GamePage() {
     };
   }, [code, eventHandler, playerAnsweredHandler, subscribe, unsubscribe]);
 
+  useEffect(() => {
+    if (gameState === Game0To100State.QUESTION) {
+      audioManager.startLoop("questionSound", { volumeModifier: -0.3 });
+    } else if (gameState === Game0To100State.RESULT) {
+      audioManager.stop("questionSound");
+    }
+
+    return () => {
+      if (gameState === Game0To100State.QUESTION) {
+        audioManager.stop("questionSound");
+      }
+    };
+  }, [gameState]);
+
   const handleAdvance = async () => {
     if (isMutating) return;
     setIsMutating(true);
