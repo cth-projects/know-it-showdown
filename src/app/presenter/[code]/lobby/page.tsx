@@ -15,7 +15,6 @@ import {
 import { Gamepad2 } from "lucide-react";
 import QRCodeGenerator from "@/app/_components/qrCodeGenerator";
 import { useParams } from "next/navigation";
-import { audioManager } from "@/lib/audioManager";
 import { AudioSettings } from "@/app/_components/audioSettings";
 
 interface GameSettingsState {
@@ -30,20 +29,6 @@ const DEFAULT_SETTINGS: GameSettingsState = {
 };
 
 export default function LobbyPage() {
-  // TODO: Only as an example > remove after implementing audio
-  useEffect(() => {
-    // Play sound ONCE when page loads
-    // audioManager.play("testPlayOnce");
-
-    // Start looping background music
-    audioManager.startLoop("testLoop", { volumeModifier: -0.3 });
-
-    // Stop looping sound when component unmounts
-    return () => {
-      audioManager.stop("testLoop");
-    };
-  }, []);
-
   const [gameSettings, setGameSettings] =
     useState<GameSettingsState>(DEFAULT_SETTINGS);
   const param = useParams();
