@@ -99,6 +99,7 @@ export default function GamePage() {
 
   const handleSubmitAnswer = async (answer: number) => {
     if (!playerName) return;
+    if (hasSubmitted) return;
 
     setHasSubmitted(true);
     setSubmittedAnswer(answer);
